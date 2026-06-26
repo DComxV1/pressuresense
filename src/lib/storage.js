@@ -1,5 +1,6 @@
-// Local persistence (no backend in v1). Settings + a daily history log so the
-// user can sanity-check the model against how they actually felt.
+// Local persistence (no backend in v1). Settings + a daily Day Log so the user
+// can sanity-check the model against how they actually felt — and capture what
+// they did, on good days as well as rough ones.
 
 const SETTINGS_KEY = 'pressuresense.settings'
 const HISTORY_KEY = 'pressuresense.history'
@@ -37,51 +38,35 @@ export function saveSettings(settings) {
   }
 }
 
+// A day entry now uses a single unified shape:
+//   { dateKey, predictedBand, score, minPressure,
+//     type: 'good'|'soso'|'rough', pain, factors: [], note }
+// Older entries used `felt`, a `flare` object, and joint/symptom tags; this
+// migration folds them into the new shape so no logged data is lost. Idempotent.
+function migrateEntry(h) {
+  let type = h.type ?? null
+  if (!type) {
+    if (h.flare) type = 'rough'
+    else if (h.felt === 'good') type = 'good'
+    else if (h.felt === 'meh') type = 'soso'
+    else if (h.felt === 'bad') type = 'rough'
+  }
+  const factors = h.factors ?? (h.flare?.helped ? [...h.flare.helped] : [])
+  let note = h.note ?? h.flare?.note ?? ''
+  const tags = [...(h.joints || []), ...(h.symptoms || [])]
+  if (tags.length) note = (note ? note + ' ' : '') + `[${tags.join(', ')}]`
+  const { felt, flare, joints, symptoms, ...rest } = h
+  return { ...rest, type, factors, note }
+}
+
 export function loadHistory() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY)
-    return raw ? JSON.parse(raw) : []
+    const arr = raw ? JSON.parse(raw) : []
+    return arr.map(migrateEntry)
   } catch {
     return []
   }
-}
-
-// Upsert today's prediction. minPressure (hPa) is stored so the correlation
-// view (A3) can plot actual pressure against logged symptoms over time.
-export function recordPrediction(dateKey, band, score, minPressure = null) {
-  const history = loadHistory()
-  const existing = history.find((h) => h.dateKey === dateKey)
-  if (existing) {
-    existing.predictedBand = band
-    existing.score = score
-    if (minPressure != null) existing.minPressure = minPressure
-  } else {
-    history.unshift({ dateKey, predictedBand: band, score, minPressure, felt: null })
-  }
-  const trimmed = history.slice(0, 60)
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed))
-  } catch {
-    /* ignore */
-  }
-  return trimmed
-}
-
-export function recordFelt(dateKey, felt) {
-  return recordCheckIn(dateKey, { felt })
-}
-
-// Merge a check-in patch (felt, pain 1-10, joints[], symptoms[]) into a day.
-// Creates the entry if today wasn't predicted yet. (A2)
-export function recordCheckIn(dateKey, patch) {
-  const history = loadHistory()
-  let existing = history.find((h) => h.dateKey === dateKey)
-  if (!existing) {
-    existing = { dateKey, predictedBand: null, score: null, felt: null }
-    history.unshift(existing)
-  }
-  Object.assign(existing, patch)
-  return saveHistory(history)
 }
 
 function saveHistory(history) {
@@ -96,44 +81,65 @@ function saveHistory(history) {
 function ensureEntry(history, dateKey) {
   let existing = history.find((h) => h.dateKey === dateKey)
   if (!existing) {
-    existing = { dateKey, predictedBand: null, score: null, felt: null }
+    existing = { dateKey, predictedBand: null, score: null }
     history.unshift(existing)
   }
   return existing
 }
 
-// Flare log (A5). Mark a rough day; optionally record what helped. The flare
-// lives on the day's history entry as { note, helped: [] }.
-export function markFlare(dateKey) {
+// Upsert today's prediction. minPressure (hPa) is stored so the correlation
+// view (A3) can plot actual pressure against the logged day type over time.
+export function recordPrediction(dateKey, band, score, minPressure = null) {
   const history = loadHistory()
-  const entry = ensureEntry(history, dateKey)
-  if (!entry.flare) entry.flare = { note: '', helped: [] }
-  if (entry.felt == null) entry.felt = 'bad' // a flare is, by definition, a bad day
+  const existing = history.find((h) => h.dateKey === dateKey)
+  if (existing) {
+    existing.predictedBand = band
+    existing.score = score
+    if (minPressure != null) existing.minPressure = minPressure
+  } else {
+    history.unshift({ dateKey, predictedBand: band, score, minPressure })
+  }
   return saveHistory(history)
 }
 
-export function updateFlare(dateKey, patch) {
+// ----- Day Log -----
+
+// Set the day type ('good' | 'soso' | 'rough') for a day.
+export function setDayType(dateKey, type) {
   const history = loadHistory()
   const entry = ensureEntry(history, dateKey)
-  entry.flare = { note: '', helped: [], ...(entry.flare || {}), ...patch }
+  entry.type = type
+  if (!entry.factors) entry.factors = []
   return saveHistory(history)
 }
 
-export function unmarkFlare(dateKey) {
+// Merge pain / note into a day entry.
+export function updateDayLog(dateKey, patch) {
+  const history = loadHistory()
+  const entry = ensureEntry(history, dateKey)
+  Object.assign(entry, patch)
+  return saveHistory(history)
+}
+
+// Toggle a factor against the CURRENT stored state (not stale UI props).
+export function toggleDayFactor(dateKey, factor) {
+  const history = loadHistory()
+  const entry = ensureEntry(history, dateKey)
+  const set = new Set(entry.factors || [])
+  set.has(factor) ? set.delete(factor) : set.add(factor)
+  entry.factors = [...set]
+  return saveHistory(history)
+}
+
+// Clear today's log (the day type and its detail), keeping the forecast.
+export function clearDayLog(dateKey) {
   const history = loadHistory()
   const entry = history.find((h) => h.dateKey === dateKey)
-  if (entry) delete entry.flare
-  return saveHistory(history)
-}
-
-// Toggle a remedy against the CURRENT stored state (not stale UI props), so
-// rapid successive toggles can't clobber each other.
-export function toggleFlareHelped(dateKey, remedy) {
-  const history = loadHistory()
-  const entry = ensureEntry(history, dateKey)
-  entry.flare = { note: '', helped: [], ...(entry.flare || {}) }
-  const set = new Set(entry.flare.helped)
-  set.has(remedy) ? set.delete(remedy) : set.add(remedy)
-  entry.flare.helped = [...set]
+  if (entry) {
+    delete entry.type
+    delete entry.pain
+    delete entry.factors
+    delete entry.note
+  }
   return saveHistory(history)
 }

@@ -94,7 +94,7 @@ function leadAction(band) {
 export function goodStreak(history) {
   let n = 0
   for (const h of history) {
-    const good = h.felt ? h.felt === 'good' : h.predictedBand === 'green'
+    const good = h.type ? h.type === 'good' : h.predictedBand === 'green'
     if (good) n++
     else break
   }

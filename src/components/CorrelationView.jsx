@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { BAND_META } from '../lib/tips.js'
 import { DEFAULT_CONFIG } from '../lib/risk.js'
+import { TYPE_BAND } from '../lib/daylog.js'
 import { formatPressure, hPaToInHg } from '../lib/format.js'
 
-// A3: overlay logged symptoms against actual pressure over time. Seeing your
+// A3: overlay the logged day type against actual pressure over time. Seeing your
 // own pattern confirmed is the trust/retention payoff. Pressure line on top,
-// felt-rating dots underneath, plus a plain-language insight.
+// day-type dots underneath, plus a plain-language insight.
 
-const FELT_BAND = { good: 'green', meh: 'yellow', bad: 'red' }
 const RANGES = [7, 14, 30]
 
 // Build a continuous day axis (oldest -> newest) and attach any logged entry.
@@ -26,7 +26,7 @@ function buildAxis(history, days) {
 
 export default function CorrelationView({ history, unit }) {
   const [days, setDays] = useState(14)
-  const loggedCount = history.filter((h) => h.felt || h.minPressure != null).length
+  const loggedCount = history.filter((h) => h.type || h.minPressure != null).length
 
   if (loggedCount < 2) {
     return (
@@ -102,14 +102,14 @@ export default function CorrelationView({ history, unit }) {
             </title>
           </circle>
         ))}
-        {/* felt dots underneath */}
+        {/* day-type dots underneath */}
         {pts.map((p) => {
-          const felt = p.entry?.felt
-          if (!felt) return null
+          const type = p.entry?.type
+          if (!type) return null
           return (
-            <circle key={`f${p.i}`} cx={x(p.i)} cy={dotRow} r="3.5" fill={BAND_META[FELT_BAND[felt]].color}>
+            <circle key={`f${p.i}`} cx={x(p.i)} cy={dotRow} r="3.5" fill={BAND_META[TYPE_BAND[type]].color}>
               <title>
-                {p.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · felt {felt}
+                {p.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · {type}
                 {p.entry.pain != null ? ` · pain ${p.entry.pain}/10` : ''}
               </title>
             </circle>
@@ -131,12 +131,12 @@ export default function CorrelationView({ history, unit }) {
 
 // Plain-language correlation: did lower-pressure days line up with worse days?
 function buildInsight(history, unit) {
-  const rows = history.filter((h) => h.minPressure != null && h.felt)
+  const rows = history.filter((h) => h.minPressure != null && h.type)
   if (rows.length < 4) {
     return 'Keep logging. In a few more days this will start to show whether low pressure lines up with your pain.'
   }
-  const bad = rows.filter((r) => r.felt === 'bad')
-  const good = rows.filter((r) => r.felt === 'good')
+  const bad = rows.filter((r) => r.type === 'rough')
+  const good = rows.filter((r) => r.type === 'good')
   if (!bad.length || !good.length) {
     return `Logged ${rows.length} days so far. Keep going. Once you've got a mix of good and painful days, the pattern will show up here.`
   }

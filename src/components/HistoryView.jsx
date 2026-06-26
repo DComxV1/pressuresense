@@ -1,79 +1,72 @@
+import { useState } from 'react'
 import { bandClasses } from './bandStyles.js'
-import { BAND_META } from '../lib/tips.js'
+import { TYPE_META } from '../lib/daylog.js'
 
-const FELT = [
-  { key: 'good', label: 'Good' },
-  { key: 'meh', label: 'So-so' },
-  { key: 'bad', label: 'Painful' },
+// Past entries from the Day Log — date + day type (color + icon + label) + pain
+// + factors/note, filterable by type.
+const FILTERS = [
+  ['all', 'All'],
+  ['good', 'Good'],
+  ['soso', 'So-so'],
+  ['rough', 'Rough'],
 ]
 
-// Log of predicted bands vs. how the user actually felt. The validation loop
-// that lets the model get tuned to a real person over a couple of weeks.
-export default function HistoryView({ history, onFelt }) {
-  if (!history?.length) {
+export default function HistoryView({ history }) {
+  const [filter, setFilter] = useState('all')
+  const entries = history.filter((h) => h.type)
+  const shown = filter === 'all' ? entries : entries.filter((h) => h.type === filter)
+
+  if (!entries.length) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-surface p-5 text-sm text-muted">
-        No history yet. Each day you open the app, today’s prediction is logged here.
-        Tap how you actually felt to start calibrating the model.
+      <div className="rounded-2xl border border-border bg-surface p-5 text-sm text-muted">
+        No entries yet. Tap how today went above, and your past entries will collect here.
       </div>
     )
   }
+
   return (
-    <div className="rounded-2xl border border-border/60 bg-surface p-4">
-      <div className="mb-3 text-xs uppercase tracking-wide text-muted">
-        Past days, and how you actually felt
-      </div>
-      <ul className="space-y-2">
-        {history.map((h) => {
-          const c = bandClasses[h.predictedBand] || bandClasses.green
-          return (
-            <li
-              key={h.dateKey}
-              className="flex items-center justify-between gap-3 rounded-lg border border-border/50 px-3 py-2"
+    <div className="rounded-2xl border border-border bg-surface p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="text-xs uppercase tracking-wide text-muted">Past entries</div>
+        <div className="inline-flex overflow-hidden rounded-lg border border-border text-xs" role="group" aria-label="Filter by day type">
+          {FILTERS.map(([v, l]) => (
+            <button
+              key={v}
+              onClick={() => setFilter(v)}
+              aria-pressed={filter === v}
+              className={`px-2.5 py-1 ${filter === v ? 'bg-accent text-white' : 'text-muted'}`}
             >
-              <div className="flex items-center gap-2">
-                <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-text">{formatDate(h.dateKey)}</span>
-                    {h.predictedBand && (
-                      <span className={`text-xs ${c.text}`}>{BAND_META[h.predictedBand]?.label}</span>
-                    )}
-                  </div>
-                  {detailSummary(h) && (
-                    <div className="text-[11px] text-muted">{detailSummary(h)}</div>
-                  )}
-                </div>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <ul className="space-y-2">
+        {shown.map((h) => {
+          const meta = TYPE_META[h.type]
+          const c = bandClasses[meta.band]
+          return (
+            <li key={h.dateKey} className="rounded-lg border border-border px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2">
+                  <span className={c.text} aria-hidden>
+                    {c.icon}
+                  </span>
+                  <span className="text-sm text-text">{formatDate(h.dateKey)}</span>
+                  <span className={`text-xs ${c.text}`}>{meta.label}</span>
+                </span>
+                {h.pain != null && <span className="text-xs text-muted">pain {h.pain}/10</span>}
               </div>
-              <div className="inline-flex overflow-hidden rounded-md border border-border">
-                {FELT.map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => onFelt(h.dateKey, f.key)}
-                    className={`px-2 py-1 text-xs ${
-                      h.felt === f.key
-                        ? 'bg-accent text-white'
-                        : 'bg-transparent text-muted hover:bg-surface-2'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
+              {h.factors?.length > 0 && <div className="mt-1 text-xs text-good-ink">{h.factors.join(', ')}</div>}
+              {h.note && <div className="mt-1 text-xs text-muted">“{h.note}”</div>}
             </li>
           )
         })}
+        {!shown.length && <li className="px-1 py-2 text-sm text-muted">No {filter} days logged yet.</li>}
       </ul>
     </div>
   )
-}
-
-function detailSummary(h) {
-  const bits = []
-  if (h.pain != null) bits.push(`pain ${h.pain}/10`)
-  const tags = [...(h.joints || []), ...(h.symptoms || [])]
-  if (tags.length) bits.push(tags.slice(0, 3).join(', ') + (tags.length > 3 ? '…' : ''))
-  return bits.join(' · ')
 }
 
 function formatDate(key) {

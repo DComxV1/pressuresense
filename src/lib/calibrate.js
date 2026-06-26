@@ -7,16 +7,15 @@
 // at each candidate sensitivity and measure agreement with the felt rating.
 
 import { scoreToBand, BAND_RANK, DEFAULT_CONFIG } from './risk.js'
+import { TYPE_BAND } from './daylog.js'
 
 export const MIN_CALIBRATION_DAYS = 10
 
-const FELT_BAND = { good: 'green', meh: 'yellow', bad: 'red' }
-
-// Logged days usable for calibration: have a model score and a felt rating.
+// Logged days usable for calibration: have a model score and a logged day type.
 export function calibrationRows(history) {
   return history
-    .filter((h) => h.score != null && h.felt && FELT_BAND[h.felt])
-    .map((h) => ({ score: h.score, feltBand: FELT_BAND[h.felt] }))
+    .filter((h) => h.score != null && h.type && TYPE_BAND[h.type])
+    .map((h) => ({ score: h.score, feltBand: TYPE_BAND[h.type] }))
 }
 
 // Ordinal distance between predicted and felt bands (green<yellow<red).

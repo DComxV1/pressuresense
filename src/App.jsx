@@ -9,11 +9,10 @@ import {
   saveSettings,
   loadHistory,
   recordPrediction,
-  recordCheckIn,
-  markFlare,
-  updateFlare,
-  toggleFlareHelped,
-  unmarkFlare,
+  setDayType,
+  updateDayLog,
+  toggleDayFactor,
+  clearDayLog,
 } from './lib/storage.js'
 
 import CurrentCard from './components/CurrentCard.jsx'
@@ -25,10 +24,9 @@ import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
 import CorrelationView from './components/CorrelationView.jsx'
 import CalibrationCard from './components/CalibrationCard.jsx'
-import FlareLog from './components/FlareLog.jsx'
+import DayLog from './components/DayLog.jsx'
 import EducationLibrary from './components/EducationLibrary.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
-import CheckInCard from './components/CheckInCard.jsx'
 import Encouragement from './components/Encouragement.jsx'
 import NotificationsCard from './components/NotificationsCard.jsx'
 
@@ -123,7 +121,6 @@ export default function App() {
 
   const todayKey = model?.today?.key || new Date().toDateString()
   const todayEntry = history.find((h) => h.dateKey === todayKey) || null
-  const onCheckIn = (patch) => setHistory(recordCheckIn(todayKey, patch))
 
   function useDeviceLocation() {
     if (!navigator.geolocation) {
@@ -189,6 +186,7 @@ export default function App() {
 
         {status === 'ready' && model && (
           <>
+            <SectionLabel>Today</SectionLabel>
             <Encouragement text={encouragement} />
             <BriefingCard
               briefing={model.briefing}
@@ -206,28 +204,25 @@ export default function App() {
           </>
         )}
 
-        {/* Track & review — the daily habit and the payoff */}
-        {status === 'ready' && <CheckInCard entry={todayEntry} onChange={onCheckIn} />}
+        <SectionLabel>Your tracking</SectionLabel>
+        {status === 'ready' && (
+          <DayLog
+            entry={todayEntry}
+            history={history}
+            onSetType={(t) => setHistory(setDayType(todayKey, t))}
+            onUpdate={(patch) => setHistory(updateDayLog(todayKey, patch))}
+            onToggleFactor={(f) => setHistory(toggleDayFactor(todayKey, f))}
+            onClear={() => setHistory(clearDayLog(todayKey))}
+          />
+        )}
 
         <CorrelationView history={history} unit={unit} />
 
-        <HistoryView
-          history={history}
-          onFelt={(dateKey, felt) => setHistory(recordCheckIn(dateKey, { felt }))}
-        />
+        <HistoryView history={history} />
 
         <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
-        <FlareLog
-          history={history}
-          todayKey={todayKey}
-          onMark={() => setHistory(markFlare(todayKey))}
-          onUpdate={(patch) => setHistory(updateFlare(todayKey, patch))}
-          onToggleHelped={(remedy) => setHistory(toggleFlareHelped(todayKey, remedy))}
-          onUnmark={() => setHistory(unmarkFlare(todayKey))}
-        />
-
-        {/* Setup & reference — set-once or occasional */}
+        <SectionLabel>Setup</SectionLabel>
         <NotificationsCard
           location={location}
           sensitivity={sensitivity}
@@ -258,6 +253,13 @@ export default function App() {
         <Disclaimer />
       </div>
     </div>
+  )
+}
+
+// Small group header that breaks the scroll into Today / Your tracking / Setup.
+function SectionLabel({ children }) {
+  return (
+    <div className="px-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted">{children}</div>
   )
 }
 
