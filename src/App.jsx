@@ -30,6 +30,8 @@ import ConditionSelector from './components/ConditionSelector.jsx'
 import Encouragement from './components/Encouragement.jsx'
 import NotificationsCard from './components/NotificationsCard.jsx'
 import BackupCard from './components/BackupCard.jsx'
+import SettingsDrawer from './components/SettingsDrawer.jsx'
+import HowItWorks from './components/HowItWorks.jsx'
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -39,6 +41,7 @@ export default function App() {
   const [locating, setLocating] = useState(false)
   const [history, setHistory] = useState(loadHistory)
   const [selectedKey, setSelectedKey] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize, morningHour, eveningHour } =
     settings
@@ -149,11 +152,20 @@ export default function App() {
 
   return (
     <div className="mx-auto min-h-full max-w-md px-4 pb-16 pt-6">
-      <header className="mb-5">
-        <h1 className="text-2xl font-bold tracking-tight text-text">PressureSense</h1>
-        <p className="text-sm text-muted">
-          A gentle heads-up on how today might feel, and easy things that help.
-        </p>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-text">PressureSense</h1>
+          <p className="text-sm text-muted">
+            A gentle heads-up on how today might feel, and easy things that help.
+          </p>
+        </div>
+        <button
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
+          className="min-h-touch min-w-touch shrink-0 rounded-lg border border-border text-xl text-text hover:bg-surface-2"
+        >
+          ☰
+        </button>
       </header>
 
       <div className="space-y-4">
@@ -223,7 +235,11 @@ export default function App() {
 
         <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
-        <SectionLabel>Setup</SectionLabel>
+        <Disclaimer />
+      </div>
+
+      <SettingsDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
+        <SectionLabel>Settings</SectionLabel>
         <NotificationsCard
           location={location}
           sensitivity={sensitivity}
@@ -251,15 +267,16 @@ export default function App() {
 
         <BackupCard />
 
+        <SectionLabel>Help</SectionLabel>
+        <HowItWorks />
         <EducationLibrary conditions={conditions || []} />
-
-        <Disclaimer />
-      </div>
+      </SettingsDrawer>
     </div>
   )
 }
 
-// Small group header that breaks the scroll into Today / Your tracking / Setup.
+// Small group header used on the main screen (Today / Your tracking) and inside
+// the slide-out menu (Settings / Help).
 function SectionLabel({ children }) {
   return (
     <div className="px-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted">{children}</div>

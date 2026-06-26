@@ -36,6 +36,7 @@ npm run preview  # serve the production build
 - **History log** — records each day's prediction and check-in detail so you can validate the model over time.
 - **Location** — city search or device geolocation (reverse-geocoded to a place name).
 - **Backup & restore** — data lives only in the browser, so Export downloads a JSON backup and Restore brings it back on a new device. History keeps up to a year; Past Entries paginates (recent 14 + "Show all").
+- **Slide-out menu** — the main screen stays focused on today + tracking; a ☰ button opens a drawer with all setup (alerts, conditions, settings, backup) plus a **How it works** FAQ explaining the science and every feature, and the education library.
 
 ## How the risk model works
 
