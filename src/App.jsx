@@ -235,6 +235,9 @@ export default function App() {
 
         <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
+        <SectionLabel>Learn</SectionLabel>
+        <EducationLibrary conditions={conditions || []} />
+
         <Disclaimer />
       </div>
 
@@ -269,7 +272,6 @@ export default function App() {
 
         <SectionLabel>Help</SectionLabel>
         <HowItWorks />
-        <EducationLibrary conditions={conditions || []} />
       </SettingsDrawer>
     </div>
   )

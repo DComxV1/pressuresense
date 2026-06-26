@@ -16,8 +16,8 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
           </div>
           <p className="mt-0.5 text-xs text-muted">
             {onboarding
-              ? 'Pick what applies so tips match how pressure affects you. You can change this anytime.'
-              : 'Tips are tailored to these.'}
+              ? 'Select all that apply, so tips match how pressure affects you. You can change this anytime.'
+              : 'Tips are tailored to these. Select all that apply.'}
           </p>
         </div>
         {onboarding && (
