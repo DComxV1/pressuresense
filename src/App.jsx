@@ -46,7 +46,9 @@ export default function App() {
   const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize, morningHour, eveningHour } =
     settings
   const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
-  const showOnboarding = !onboarded && (conditions || []).length === 0
+  // Stays up through the whole pick; dismissed only by Done/Skip, not by the
+  // first selection.
+  const showOnboarding = !onboarded
 
   // Persist settings whenever they change.
   useEffect(() => saveSettings(settings), [settings])
@@ -119,7 +121,7 @@ export default function App() {
     setSettings((s) => {
       const set = new Set(s.conditions || [])
       set.has(key) ? set.delete(key) : set.add(key)
-      return { ...s, conditions: [...set], onboarded: true }
+      return { ...s, conditions: [...set] }
     })
   }
 

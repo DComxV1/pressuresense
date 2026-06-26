@@ -51,6 +51,15 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
           )
         })}
       </div>
+
+      {onboarding && (
+        <button
+          onClick={onDismiss}
+          className="mt-4 min-h-touch w-full rounded-lg bg-accent px-4 text-sm font-medium text-white"
+        >
+          {selected.length ? `Done (${selected.length} selected)` : 'Done'}
+        </button>
+      )}
     </div>
   )
 }
