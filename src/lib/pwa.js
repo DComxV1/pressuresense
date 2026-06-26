@@ -86,16 +86,25 @@ export async function subscribeToPush({ location, sensitivity, morningHour, even
 }
 
 // Ask the backend to send a real push right now (verifies the full pipeline).
+// Always resolves (never hangs the UI) — times out and reports errors instead.
 export async function sendServerTest() {
-  const reg = await navigator.serviceWorker.ready
-  const sub = await reg.pushManager.getSubscription()
-  if (!sub) return { ok: false, error: 'not subscribed' }
-  const res = await fetch(`${WORKER_URL}/test`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ subscription: sub.toJSON() }),
-  })
-  return res.json().catch(() => ({ ok: false }))
+  try {
+    const reg = await navigator.serviceWorker.ready
+    const sub = await reg.pushManager.getSubscription()
+    if (!sub) return { ok: false, error: 'not subscribed' }
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 12000)
+    const res = await fetch(`${WORKER_URL}/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub.toJSON() }),
+      signal: controller.signal,
+    })
+    clearTimeout(timer)
+    return await res.json().catch(() => ({ ok: false, status: res.status }))
+  } catch (e) {
+    return { ok: false, error: e?.name === 'AbortError' ? 'timed out' : String(e?.message || e) }
+  }
 }
 
 export async function unsubscribeFromPush() {

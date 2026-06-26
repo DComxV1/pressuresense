@@ -92,7 +92,8 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
     if (r?.ok) {
       setTestMsg('Sent. If you don’t see it, swipe to the Home Screen and check — iOS often hides the banner while the app is open.')
     } else {
-      setTestMsg(`Couldn’t send (status ${r?.status || '?'}${r?.detail ? `: ${r.detail}` : ''}).`)
+      const why = r?.detail || r?.error || `status ${r?.status || '?'}`
+      setTestMsg(`Couldn’t send (${why}).`)
     }
   }
 

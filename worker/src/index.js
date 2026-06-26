@@ -51,7 +51,10 @@ async function hkdf(salt, ikm, info, length) {
 }
 
 async function vapidAuthHeader(endpoint, env) {
-  const jwk = JSON.parse(env.VAPID_PRIVATE_JWK)
+  // Strip a leading BOM (U+FEFF) in case the secret was uploaded with one.
+  let rawKey = env.VAPID_PRIVATE_JWK || ''
+  if (rawKey.charCodeAt(0) === 0xfeff) rawKey = rawKey.slice(1)
+  const jwk = JSON.parse(rawKey)
   const key = await crypto.subtle.importKey(
     'jwk',
     { kty: 'EC', crv: 'P-256', d: jwk.d, x: jwk.x, y: jwk.y, ext: true },
@@ -187,9 +190,27 @@ const json = (obj, status = 200) =>
 
 export default {
   async fetch(request, env) {
+    try {
+      return await handle(request, env)
+    } catch (e) {
+      // Always answer with CORS headers, so the client never hangs on a
+      // header-less error response.
+      return json({ ok: false, error: String(e && e.message ? e.message : e) }, 500)
+    }
+  },
+  scheduled: scheduledHandler,
+}
+
+async function handle(request, env) {
     const url = new URL(request.url)
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
     if (url.pathname === '/' || url.pathname === '/health') return json({ ok: true })
+
+    // Verify the VAPID key parses and signs, without needing a real subscription.
+    if (url.pathname === '/selftest') {
+      const auth = await vapidAuthHeader('https://example.com/x', env)
+      return json({ ok: true, vapid: auth.slice(0, 16) })
+    }
 
     if (request.method === 'POST' && url.pathname === '/subscribe') {
       const data = await request.json().catch(() => null)
@@ -239,9 +260,9 @@ export default {
     }
 
     return json({ error: 'not found' }, 404)
-  },
+}
 
-  async scheduled(event, env) {
+async function scheduledHandler(event, env) {
     const now = new Date(event.scheduledTime)
     const list = await env.SUBS.list()
     for (const k of list.keys) {
@@ -282,7 +303,6 @@ export default {
         // skip this subscriber on error
       }
     }
-  },
 }
 
 function clampHour(v, fallback) {
