@@ -30,6 +30,7 @@ import EducationLibrary from './components/EducationLibrary.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
 import Encouragement from './components/Encouragement.jsx'
+import NotificationsCard from './components/NotificationsCard.jsx'
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -234,6 +235,8 @@ export default function App() {
         {!showOnboarding && (
           <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
         )}
+
+        <NotificationsCard />
 
         <EducationLibrary conditions={conditions || []} />
 

@@ -1,0 +1,17 @@
+{
+  "id": "/pressuresense/",
+  "name": "PressureSense",
+  "short_name": "PressureSense",
+  "description": "A gentle heads-up on how today might feel, and easy things that help.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F9FB",
+  "theme_color": "#2D6A9F",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

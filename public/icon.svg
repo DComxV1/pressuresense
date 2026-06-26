@@ -1,0 +1,11 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PressureSense">
+  <rect width="512" height="512" fill="#2D6A9F"/>
+  <!-- barometer dial -->
+  <circle cx="256" cy="272" r="150" fill="none" stroke="#FFFFFF" stroke-width="26" opacity="0.95"/>
+  <!-- needle -->
+  <line x1="256" y1="272" x2="366" y2="166" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"/>
+  <!-- hub -->
+  <circle cx="256" cy="272" r="30" fill="#FFFFFF"/>
+  <!-- needle tip accent (brand teal) -->
+  <circle cx="366" cy="166" r="17" fill="#3FB0A1"/>
+</svg>
