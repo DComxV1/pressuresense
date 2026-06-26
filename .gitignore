@@ -4,3 +4,6 @@ dist-ssr
 *.local
 .DS_Store
 .vite
+
+# Business/pricing strategy — keep out of the public repo
+pressuresense-monetization.md
