@@ -26,6 +26,7 @@ import HistoryView from './components/HistoryView.jsx'
 import CorrelationView from './components/CorrelationView.jsx'
 import CalibrationCard from './components/CalibrationCard.jsx'
 import FlareLog from './components/FlareLog.jsx'
+import EducationLibrary from './components/EducationLibrary.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
 
@@ -215,6 +216,8 @@ export default function App() {
         {!showOnboarding && (
           <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
         )}
+
+        <EducationLibrary conditions={conditions || []} />
 
         <CorrelationView history={history} unit={unit} />
 
