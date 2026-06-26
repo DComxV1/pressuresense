@@ -7,10 +7,10 @@ compatibility_date = "2024-11-01"
 binding = "SUBS"
 id = "115c3e75f5af41ac8b6ab914428fc4fe"
 
-# Daily checks: ~6-7am ET (11:00 UTC) for a today heads-up, and ~6-7pm ET
-# (23:00 UTC) for next-day prep. Dedupe means at most one alert per tough day.
+# Runs hourly; each subscriber is notified at THEIR chosen local morning/evening
+# hours (computed from the timezone stored at subscribe time).
 [triggers]
-crons = ["0 11 * * *", "0 23 * * *"]
+crons = ["0 * * * *"]
 
 [vars]
 VAPID_SUBJECT = "mailto:delfin.cuevas@gmail.com"

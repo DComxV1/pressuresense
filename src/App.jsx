@@ -41,7 +41,7 @@ export default function App() {
   const [history, setHistory] = useState(loadHistory)
   const [selectedKey, setSelectedKey] = useState(null)
 
-  const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize } =
+  const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize, morningHour, eveningHour } =
     settings
   const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
   const showOnboarding = !onboarded && (conditions || []).length === 0
@@ -236,7 +236,13 @@ export default function App() {
           <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
         )}
 
-        <NotificationsCard location={location} sensitivity={sensitivity} />
+        <NotificationsCard
+          location={location}
+          sensitivity={sensitivity}
+          morningHour={morningHour ?? 7}
+          eveningHour={eveningHour ?? 19}
+          onHours={(patch) => update(patch)}
+        />
 
         <EducationLibrary conditions={conditions || []} />
 

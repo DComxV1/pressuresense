@@ -15,7 +15,14 @@ import {
 // Push, Phase 2: grant permission, subscribe with the backend (which sends the
 // scheduled pre-flare alerts), and verify with a real server push. On iOS, web
 // push only works once the PWA is installed to the Home Screen.
-export default function NotificationsCard({ location, sensitivity }) {
+const HOURS = Array.from({ length: 24 }, (_, h) => h)
+function hourLabel(h) {
+  const ap = h < 12 ? 'AM' : 'PM'
+  const hr = h % 12 === 0 ? 12 : h % 12
+  return `${hr} ${ap}`
+}
+
+export default function NotificationsCard({ location, sensitivity, morningHour, eveningHour, onHours }) {
   const [perm, setPerm] = useState(notificationPermission())
   const [installEvent, setInstallEvent] = useState(null)
   const [installed, setInstalled] = useState(isStandalone())
@@ -44,10 +51,11 @@ export default function NotificationsCard({ location, sensitivity }) {
     }
   }, [])
 
-  // Keep the backend's copy of location + sensitivity fresh.
+  // Keep the backend's copy of location, sensitivity, and times fresh.
   useEffect(() => {
-    if (subscribed && location) subscribeToPush(location, sensitivity).catch(() => {})
-  }, [subscribed, location?.latitude, location?.longitude, sensitivity])
+    if (subscribed && location)
+      subscribeToPush({ location, sensitivity, morningHour, eveningHour }).catch(() => {})
+  }, [subscribed, location?.latitude, location?.longitude, sensitivity, morningHour, eveningHour])
 
   async function enable() {
     setBusy(true)
@@ -57,7 +65,7 @@ export default function NotificationsCard({ location, sensitivity }) {
       const result = await requestNotificationPermission()
       setPerm(result)
       if (result === 'granted') {
-        await subscribeToPush(location, sensitivity)
+        await subscribeToPush({ location, sensitivity, morningHour, eveningHour })
         setSubscribed(true)
       }
     } catch (e) {
@@ -135,6 +143,39 @@ export default function NotificationsCard({ location, sensitivity }) {
                 Turn off
               </button>
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="text-sm text-muted">
+                Good-morning note
+                <select
+                  value={morningHour}
+                  onChange={(e) => onHours({ morningHour: Number(e.target.value) })}
+                  className="mt-1 block w-full min-h-touch rounded-lg border border-border bg-surface-2 px-2 text-text"
+                >
+                  {HOURS.map((h) => (
+                    <option key={h} value={h}>
+                      {hourLabel(h)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-sm text-muted">
+                Evening heads-up
+                <select
+                  value={eveningHour}
+                  onChange={(e) => onHours({ eveningHour: Number(e.target.value) })}
+                  className="mt-1 block w-full min-h-touch rounded-lg border border-border bg-surface-2 px-2 text-text"
+                >
+                  {HOURS.map((h) => (
+                    <option key={h} value={h}>
+                      {hourLabel(h)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <p className="text-xs text-muted">Times are in your local timezone.</p>
+
             {testMsg && <p className="text-sm text-muted">{testMsg}</p>}
           </div>
         )}

@@ -13,13 +13,15 @@ web-push alerts. Web push is implemented with the Web Crypto API (RFC 8291
 - `GET /health`
 
 ## Schedule
-Crons `0 11 * * *` and `0 23 * * *` (UTC ≈ morning/evening ET):
+Cron `0 * * * *` (hourly). Each subscriber stores their IANA `tz` plus a
+`morningHour` and `eveningHour` (local). On each run, a subscriber is considered
+only when their local hour matches one of those:
 - **Morning** sends a "good day, keep it good" note, but only when today is green.
 - **Evening** sends tomorrow's heads-up, but only when tomorrow is not green.
 
-So good days get a gentle morning note and tough days get an evening prep, with
-at most one message per day (deduped via `lastNotified`). Expired subscriptions
-(404/410) are pruned.
+So good days get a gentle morning note and tough days get an evening prep, at the
+user's own local times (DST handled via `Intl`), deduped per slot via
+`lastMorning` / `lastEvening`. Expired subscriptions (404/410) are pruned.
 
 ## Config / secrets
 - `wrangler.toml`: KV binding `SUBS`, `VAPID_PUBLIC`, `VAPID_SUBJECT`, `APP_URL`.

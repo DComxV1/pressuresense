@@ -64,9 +64,10 @@ export async function showTestNotification() {
   })
 }
 
-// Subscribe to push and register the subscription (+ location + sensitivity)
-// with the backend, which is what actually sends the scheduled alerts.
-export async function subscribeToPush(location, sensitivity) {
+// Subscribe to push and register the subscription with the backend (which
+// sends the alerts) — along with location, sensitivity, the device timezone,
+// and the user's chosen morning/evening hours.
+export async function subscribeToPush({ location, sensitivity, morningHour, eveningHour }) {
   const reg = await navigator.serviceWorker.ready
   let sub = await reg.pushManager.getSubscription()
   if (!sub) {
@@ -75,10 +76,11 @@ export async function subscribeToPush(location, sensitivity) {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
     })
   }
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
   await fetch(`${WORKER_URL}/subscribe`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ subscription: sub.toJSON(), location, sensitivity }),
+    body: JSON.stringify({ subscription: sub.toJSON(), location, sensitivity, tz, morningHour, eveningHour }),
   })
   return sub
 }

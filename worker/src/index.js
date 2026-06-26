@@ -193,12 +193,18 @@ export default {
       const data = await request.json().catch(() => null)
       if (!data?.subscription?.endpoint || !data.subscription.keys?.p256dh) return json({ error: 'bad subscription' }, 400)
       const key = await sha256Hex(data.subscription.endpoint)
+      // Preserve send-history across re-subscribes (e.g. when prefs change), so
+      // updating a time doesn't trigger a duplicate.
+      const prev = JSON.parse((await env.SUBS.get(key)) || 'null') || {}
       const record = {
         subscription: data.subscription,
         location: data.location || null,
         sensitivity: data.sensitivity ?? 50,
-        lastNotified: null,
-        created: new Date(env.NOW || Date.now()).toISOString?.() || null,
+        tz: data.tz || 'UTC',
+        morningHour: clampHour(data.morningHour, 7),
+        eveningHour: clampHour(data.eveningHour, 19),
+        lastMorning: prev.lastMorning ?? null,
+        lastEvening: prev.lastEvening ?? null,
       }
       await env.SUBS.put(key, JSON.stringify(record))
       return json({ ok: true })
@@ -233,20 +239,30 @@ export default {
   },
 
   async scheduled(event, env) {
-    const slot = new Date(event.scheduledTime).getUTCHours() >= 18 ? 'evening' : 'morning'
+    const now = new Date(event.scheduledTime)
     const list = await env.SUBS.list()
     for (const k of list.keys) {
       const raw = await env.SUBS.get(k.name)
       if (!raw) continue
       const sub = JSON.parse(raw)
       if (!sub.location) continue
+
+      // Notify only at the subscriber's own local morning/evening hour.
+      const lh = localHour(sub.tz || 'UTC', now)
+      let slot = null
+      if (lh === (sub.morningHour ?? 7)) slot = 'morning'
+      else if (lh === (sub.eveningHour ?? 19)) slot = 'evening'
+      if (!slot) continue
+
       try {
         const f = await forecastForDay(sub.location, sub.sensitivity, slot)
-        if (sub.lastNotified === f.targetDate) continue // at most one message per day
         // Mornings carry the good-day "keep it good" note; evenings are the
         // heads-up for tomorrow, and only when tomorrow is not green.
         if (slot === 'morning' && f.band !== 'green') continue
         if (slot === 'evening' && f.band === 'green') continue
+        const lastKey = slot === 'morning' ? 'lastMorning' : 'lastEvening'
+        if (sub[lastKey] === f.targetDate) continue
+
         const m = buildMessage(f.band, f.isToday)
         const status = await sendPush(
           sub.subscription,
@@ -257,11 +273,27 @@ export default {
           await env.SUBS.delete(k.name)
           continue
         }
-        sub.lastNotified = f.targetDate
+        sub[lastKey] = f.targetDate
         await env.SUBS.put(k.name, JSON.stringify(sub))
       } catch {
         // skip this subscriber on error
       }
     }
   },
+}
+
+function clampHour(v, fallback) {
+  const n = Math.round(Number(v))
+  return Number.isFinite(n) && n >= 0 && n <= 23 ? n : fallback
+}
+
+// Current hour (0-23) in the given IANA timezone. Workers ship full ICU, so
+// Intl handles the timezone (and DST) for us.
+function localHour(tz, date) {
+  try {
+    const s = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', hourCycle: 'h23' }).format(date)
+    return parseInt(s, 10) % 24
+  } catch {
+    return date.getUTCHours()
+  }
 }

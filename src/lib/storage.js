@@ -12,6 +12,8 @@ export const DEFAULT_SETTINGS = {
   conditions: [], // selected condition keys (A1); [] => onboarding prompt
   onboarded: false, // dismissed the condition prompt at least once
   includeWeather: false, // fold temperature/humidity/temp-swing into the score (A7)
+  morningHour: 7, // local hour for the good-day note (0-23)
+  eveningHour: 19, // local hour for the tougher-day heads-up (0-23)
   // Seeded so the dashboard populates on first run; change via "Use my location"
   // or city search.
   location: { label: 'Nags Head, NC', latitude: 35.957, longitude: -75.624 },
