@@ -242,7 +242,11 @@ export default {
       if (!sub.location) continue
       try {
         const f = await forecastForDay(sub.location, sub.sensitivity, slot)
-        if (sub.lastNotified === f.targetDate) continue // one briefing per day
+        if (sub.lastNotified === f.targetDate) continue // at most one message per day
+        // Mornings carry the good-day "keep it good" note; evenings are the
+        // heads-up for tomorrow, and only when tomorrow is not green.
+        if (slot === 'morning' && f.band !== 'green') continue
+        if (slot === 'evening' && f.band === 'green') continue
         const m = buildMessage(f.band, f.isToday)
         const status = await sendPush(
           sub.subscription,
