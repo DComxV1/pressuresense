@@ -5,6 +5,9 @@
 const SETTINGS_KEY = 'pressuresense.settings'
 const HISTORY_KEY = 'pressuresense.history'
 
+// Keep up to a year of day entries (~60-100 KB; localStorage holds ~5 MB).
+const MAX_HISTORY = 365
+
 export const DEFAULT_SETTINGS = {
   unit: 'inHg', // 'inHg' | 'hPa'
   theme: 'light', // 'light' | 'dark' (light default per the a11y addendum)
@@ -71,7 +74,7 @@ export function loadHistory() {
 
 function saveHistory(history) {
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 60)))
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY)))
   } catch {
     /* ignore */
   }
@@ -142,4 +145,27 @@ export function clearDayLog(dateKey) {
     delete entry.note
   }
   return saveHistory(history)
+}
+
+// ----- Backup / restore -----
+// Everything lives only in this browser, so export is the real safety net for
+// a phone change or a cleared browser.
+export function exportData(now = new Date()) {
+  return {
+    app: 'pressuresense',
+    version: 1,
+    exportedAt: now.toISOString(),
+    settings: loadSettings(),
+    history: loadHistory(),
+  }
+}
+
+export function importData(obj) {
+  if (!obj || obj.app !== 'pressuresense') throw new Error('That doesn’t look like a PressureSense backup.')
+  if (obj.settings && typeof obj.settings === 'object') {
+    saveSettings({ ...DEFAULT_SETTINGS, ...obj.settings })
+  }
+  if (Array.isArray(obj.history)) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(obj.history.slice(0, MAX_HISTORY)))
+  }
 }

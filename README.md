@@ -35,6 +35,7 @@ npm run preview  # serve the production build
 - **Correlation view ("Your pattern")** — a 7/14/30-day chart overlaying actual pressure against your logged symptoms, with a plain-language insight (e.g. "painful days averaged 29.54 inHg vs 30.08 on good days") so you can see your own pattern confirmed.
 - **History log** — records each day's prediction and check-in detail so you can validate the model over time.
 - **Location** — city search or device geolocation (reverse-geocoded to a place name).
+- **Backup & restore** — data lives only in the browser, so Export downloads a JSON backup and Restore brings it back on a new device. History keeps up to a year; Past Entries paginates (recent 14 + "Show all").
 
 ## How the risk model works
 

@@ -11,10 +11,14 @@ const FILTERS = [
   ['rough', 'Rough'],
 ]
 
+const PAGE = 14
+
 export default function HistoryView({ history }) {
   const [filter, setFilter] = useState('all')
+  const [showAll, setShowAll] = useState(false)
   const entries = history.filter((h) => h.type)
   const shown = filter === 'all' ? entries : entries.filter((h) => h.type === filter)
+  const visible = showAll ? shown : shown.slice(0, PAGE)
 
   if (!entries.length) {
     return (
@@ -43,7 +47,7 @@ export default function HistoryView({ history }) {
       </div>
 
       <ul className="space-y-2">
-        {shown.map((h) => {
+        {visible.map((h) => {
           const meta = TYPE_META[h.type]
           const c = bandClasses[meta.band]
           return (
@@ -65,6 +69,15 @@ export default function HistoryView({ history }) {
         })}
         {!shown.length && <li className="px-1 py-2 text-sm text-muted">No {filter} days logged yet.</li>}
       </ul>
+
+      {shown.length > PAGE && (
+        <button
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-3 text-sm text-muted underline underline-offset-4 hover:text-text"
+        >
+          {showAll ? 'Show less' : `Show all ${shown.length}`}
+        </button>
+      )}
     </div>
   )
 }
