@@ -31,18 +31,18 @@ export default function LocationBar({ location, onPick, onUseDevice, locating })
   }
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4">
+    <div className="rounded-2xl border border-border/60 bg-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs uppercase tracking-wide text-slate-400">Location</div>
-          <div className="truncate text-sm font-medium text-slate-200">
+          <div className="text-xs uppercase tracking-wide text-muted">Location</div>
+          <div className="truncate text-sm font-medium text-text">
             {location?.label || 'Not set'}
           </div>
         </div>
         <button
           onClick={onUseDevice}
           disabled={locating}
-          className="shrink-0 rounded-lg border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700/50 disabled:opacity-50"
+          className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-sm text-text hover:bg-surface-2 disabled:opacity-50"
         >
           {locating ? 'Locating…' : 'Use my location'}
         </button>
@@ -53,26 +53,26 @@ export default function LocationBar({ location, onPick, onUseDevice, locating })
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search a city…"
-          className="w-full rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500"
+          className="w-full rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-sm text-text placeholder-muted outline-none focus:border-accent"
         />
         <button
           type="submit"
           disabled={busy}
-          className="rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50"
+          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent disabled:opacity-50"
         >
           {busy ? '…' : 'Search'}
         </button>
       </form>
 
-      {error && <div className="mt-2 text-xs text-red-400">{error}</div>}
+      {error && <div className="mt-2 text-xs text-high-ink">{error}</div>}
 
       {results.length > 0 && (
-        <ul className="mt-2 divide-y divide-slate-700/60 overflow-hidden rounded-lg border border-slate-700/60">
+        <ul className="mt-2 divide-y divide-border/60 overflow-hidden rounded-lg border border-border/60">
           {results.map((r, i) => (
             <li key={i}>
               <button
                 onClick={() => pick(r)}
-                className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700/50"
+                className="block w-full px-3 py-2 text-left text-sm text-text hover:bg-surface-2"
               >
                 {r.label}
               </button>

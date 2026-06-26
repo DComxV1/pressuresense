@@ -6,6 +6,8 @@ const HISTORY_KEY = 'pressuresense.history'
 
 export const DEFAULT_SETTINGS = {
   unit: 'inHg', // 'inHg' | 'hPa'
+  theme: 'light', // 'light' | 'dark' (light default per the a11y addendum)
+  textSize: 'default', // 'default' | 'large' | 'xl'
   sensitivity: 50, // 0-100
   conditions: [], // selected condition keys (A1); [] => onboarding prompt
   onboarded: false, // dismissed the condition prompt at least once

@@ -31,28 +31,28 @@ export default function CurrentCard({ current, unit }) {
     <div className={`rounded-2xl border ${c.border} ${c.bg} p-5`}>
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-xs uppercase tracking-wide text-slate-300">Current pressure</div>
-          <div className="mt-1 text-4xl font-semibold tabular-nums text-slate-100">
+          <div className="text-xs uppercase tracking-wide text-muted">Current pressure</div>
+          <div className="mt-1 text-4xl font-semibold tabular-nums text-text">
             {formatPressure(current.hPa, unit)}
           </div>
           <div className={`mt-1 text-sm ${c.text}`}>
             {trendArrow[current.trend]} {trendWord[current.trend]} now
             {current.trend3h != null && (
-              <span className="text-slate-300"> · {trend3hLabel(current.trend3h, unit)}</span>
+              <span className="text-muted"> · {trend3hLabel(current.trend3h, unit)}</span>
             )}
           </div>
         </div>
         <div
           className={`flex items-center gap-2 rounded-full ${c.bg} ${c.text} px-3 py-1 text-sm font-medium`}
         >
-          <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
+          <span aria-hidden>{c.icon}</span>
           {current.band.toUpperCase()}
         </div>
       </div>
       {fwd && (
         <div
           className={`mt-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm ${
-            fwdAccent ? `${c.bg} ${c.text}` : 'bg-slate-700/40 text-slate-300'
+            fwdAccent ? `${c.bg} ${c.text}` : 'bg-surface-2 text-muted'
           }`}
         >
           <span aria-hidden>{fwdAccent ? '↓' : '→'}</span>

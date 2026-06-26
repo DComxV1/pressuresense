@@ -12,15 +12,15 @@ const FELT = [
 export default function HistoryView({ history, onFelt }) {
   if (!history?.length) {
     return (
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5 text-sm text-slate-400">
+      <div className="rounded-2xl border border-border/60 bg-surface p-5 text-sm text-muted">
         No history yet. Each day you open the app, today’s prediction is logged here.
         Tap how you actually felt to start calibrating the model.
       </div>
     )
   }
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4">
-      <div className="mb-3 text-xs uppercase tracking-wide text-slate-400">
+    <div className="rounded-2xl border border-border/60 bg-surface p-4">
+      <div className="mb-3 text-xs uppercase tracking-wide text-muted">
         Past days, and how you actually felt
       </div>
       <ul className="space-y-2">
@@ -29,31 +29,31 @@ export default function HistoryView({ history, onFelt }) {
           return (
             <li
               key={h.dateKey}
-              className="flex items-center justify-between gap-3 rounded-lg border border-slate-700/50 px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-lg border border-border/50 px-3 py-2"
             >
               <div className="flex items-center gap-2">
                 <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-200">{formatDate(h.dateKey)}</span>
+                    <span className="text-sm text-text">{formatDate(h.dateKey)}</span>
                     {h.predictedBand && (
                       <span className={`text-xs ${c.text}`}>{BAND_META[h.predictedBand]?.label}</span>
                     )}
                   </div>
                   {detailSummary(h) && (
-                    <div className="text-[11px] text-slate-400">{detailSummary(h)}</div>
+                    <div className="text-[11px] text-muted">{detailSummary(h)}</div>
                   )}
                 </div>
               </div>
-              <div className="inline-flex overflow-hidden rounded-md border border-slate-600">
+              <div className="inline-flex overflow-hidden rounded-md border border-border">
                 {FELT.map((f) => (
                   <button
                     key={f.key}
                     onClick={() => onFelt(h.dateKey, f.key)}
                     className={`px-2 py-1 text-xs ${
                       h.felt === f.key
-                        ? 'bg-slate-200 text-slate-900'
-                        : 'bg-transparent text-slate-400 hover:bg-slate-700/50'
+                        ? 'bg-accent text-white'
+                        : 'bg-transparent text-muted hover:bg-surface-2'
                     }`}
                   >
                     {f.label}

@@ -1,5 +1,6 @@
-// Sensitivity slider + unit toggle. Sensitivity calibrates when the model tips
-// into YELLOW/RED. Everyone's pressure sensitivity is individual.
+// Sensitivity, units, weather factors, and appearance (theme + text size).
+// Sensitivity calibrates when the model tips into YELLOW/RED. Everyone's
+// pressure sensitivity is individual.
 export default function Controls({
   sensitivity,
   onSensitivity,
@@ -7,14 +8,18 @@ export default function Controls({
   onUnit,
   includeWeather,
   onIncludeWeather,
+  theme,
+  onTheme,
+  textSize,
+  onTextSize,
 }) {
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
+    <div className="rounded-2xl border border-border bg-surface p-5">
       <div className="flex items-center justify-between">
-        <label htmlFor="sens" className="text-sm font-medium text-slate-200">
+        <label htmlFor="sens" className="text-sm font-medium text-text">
           Sensitivity
         </label>
-        <span className="text-xs text-slate-400">{sensLabel(sensitivity)}</span>
+        <span className="text-xs text-muted">{sensLabel(sensitivity)}</span>
       </div>
       <input
         id="sens"
@@ -25,36 +30,57 @@ export default function Controls({
         value={sensitivity}
         onChange={(e) => onSensitivity(Number(e.target.value))}
         aria-valuetext={`${sensLabel(sensitivity)} sensitivity`}
-        className="mt-3 w-full accent-sky-500"
+        className="mt-3 h-3 w-full accent-accent"
       />
-      <div className="mt-1 flex justify-between text-[11px] text-slate-500">
+      <div className="mt-1 flex justify-between text-[11px] text-muted">
         <span>Less sensitive</span>
         <span>More sensitive</span>
       </div>
 
-      <div className="mt-5 flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-200">Units</span>
-        <div className="inline-flex overflow-hidden rounded-lg border border-slate-600">
-          {['inHg', 'hPa'].map((u) => (
-            <button
-              key={u}
-              onClick={() => onUnit(u)}
-              aria-pressed={unit === u}
-              aria-label={`Show pressure in ${u}`}
-              className={`px-3 py-1 text-sm ${
-                unit === u ? 'bg-sky-600 text-white' : 'bg-transparent text-slate-300'
-              }`}
-            >
-              {u}
-            </button>
-          ))}
-        </div>
+      <div className="mt-6 flex items-center justify-between">
+        <span className="text-sm font-medium text-text">Units</span>
+        <Segmented
+          options={[
+            ['inHg', 'inHg'],
+            ['hPa', 'hPa'],
+          ]}
+          value={unit}
+          onChange={onUnit}
+          ariaLabel="Pressure units"
+        />
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-3">
+      <div className="mt-6 flex items-center justify-between">
+        <span className="text-sm font-medium text-text">Theme</span>
+        <Segmented
+          options={[
+            ['light', 'Light'],
+            ['dark', 'Dark'],
+          ]}
+          value={theme}
+          onChange={onTheme}
+          ariaLabel="Color theme"
+        />
+      </div>
+
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <span className="text-sm font-medium text-text">Text size</span>
+        <Segmented
+          options={[
+            ['default', 'A'],
+            ['large', 'A+'],
+            ['xl', 'A++'],
+          ]}
+          value={textSize}
+          onChange={onTextSize}
+          ariaLabel="Text size"
+        />
+      </div>
+
+      <div className="mt-6 flex items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-slate-200">Weather factors</div>
-          <p className="text-xs text-slate-400">
+          <div className="text-sm font-medium text-text">Weather factors</div>
+          <p className="text-xs text-muted">
             Also weigh cold, humidity &amp; temperature swings, not just pressure.
           </p>
         </div>
@@ -63,17 +89,36 @@ export default function Controls({
           aria-checked={includeWeather}
           aria-label="Include temperature and humidity in the risk score"
           onClick={() => onIncludeWeather(!includeWeather)}
-          className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-            includeWeather ? 'bg-sky-600' : 'bg-slate-600'
+          className={`relative h-7 w-12 shrink-0 rounded-full transition ${
+            includeWeather ? 'bg-accent' : 'bg-border'
           }`}
         >
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${
-              includeWeather ? 'left-[22px]' : 'left-0.5'
+            className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
+              includeWeather ? 'left-[26px]' : 'left-1'
             }`}
           />
         </button>
       </div>
+    </div>
+  )
+}
+
+function Segmented({ options, value, onChange, ariaLabel }) {
+  return (
+    <div className="inline-flex overflow-hidden rounded-lg border border-border" role="group" aria-label={ariaLabel}>
+      {options.map(([val, label]) => (
+        <button
+          key={val}
+          onClick={() => onChange(val)}
+          aria-pressed={value === val}
+          className={`min-h-touch px-3 text-sm ${
+            value === val ? 'bg-accent text-white' : 'bg-transparent text-muted hover:bg-surface-2'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   )
 }

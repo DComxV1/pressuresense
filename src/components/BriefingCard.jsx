@@ -10,15 +10,17 @@ export default function BriefingCard({ briefing, tips, explanation }) {
   const label = BAND_META[briefing.band]?.label || briefing.band.toUpperCase()
   return (
     <div className={`rounded-2xl border ${c.border} ${c.bg} p-5`}>
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-300">
-        <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
+      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted">
+        <span className={`${c.text} not-italic`} aria-hidden>
+          {c.icon}
+        </span>
         Today’s briefing · {label}
       </div>
-      <p className="mt-2 text-lg font-medium leading-snug text-slate-100">{briefing.text}</p>
+      <p className="mt-2 text-lg font-medium leading-snug text-text">{briefing.text}</p>
       {tips?.length > 0 && (
         <ul className="mt-4 space-y-1.5">
           {tips.map((t, i) => (
-            <li key={i} className="flex gap-2 text-sm text-slate-200">
+            <li key={i} className="flex gap-2 text-sm text-text">
               <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${c.dot}`} aria-hidden />
               <span>{t}</span>
             </li>
@@ -30,12 +32,12 @@ export default function BriefingCard({ briefing, tips, explanation }) {
           <button
             onClick={() => setShowWhy((v) => !v)}
             aria-expanded={showWhy}
-            className="text-sm font-medium text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+            className="text-sm font-medium text-muted underline decoration-border underline-offset-4 hover:text-text"
           >
             {showWhy ? 'Hide reasoning' : `Why ${label.toLowerCase()}?`}
           </button>
           {showWhy && (
-            <p className="mt-2 rounded-lg bg-slate-900/40 p-3 text-sm leading-relaxed text-slate-300">
+            <p className="mt-2 rounded-lg bg-surface-2 p-3 text-sm leading-relaxed text-muted">
               {explanation}
             </p>
           )}

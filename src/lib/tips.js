@@ -6,25 +6,12 @@
 
 import { hourLabel, hPaToInHg } from './format.js'
 
+// `color` resolves a CSS token, so charts recolor automatically when the theme
+// changes. `icon` is the redundant shape signal that rides alongside the label.
 export const BAND_META = {
-  green: {
-    label: 'GREEN',
-    title: 'Low risk',
-    color: '#16a34a',
-    headline: 'Good day. Pressure is stable and comfortable.',
-  },
-  yellow: {
-    label: 'YELLOW',
-    title: 'Moderate risk',
-    color: '#d97706',
-    headline: 'Some pressure movement today. Stay ahead of it.',
-  },
-  red: {
-    label: 'RED',
-    title: 'High risk',
-    color: '#dc2626',
-    headline: 'Significant pressure drop. Be proactive before a flare.',
-  },
+  green: { label: 'GREEN', title: 'Low risk', icon: '✓', color: 'rgb(var(--good))' },
+  yellow: { label: 'YELLOW', title: 'Moderate risk', icon: '⚠', color: 'rgb(var(--caution))' },
+  red: { label: 'RED', title: 'High risk', icon: '◆', color: 'rgb(var(--high))' },
 }
 
 export const TIPS = {

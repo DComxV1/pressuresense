@@ -34,7 +34,7 @@ export default function ForecastStrip({ days, unit, onSelect, selectedKey }) {
   if (!days?.length) return null
   return (
     <div>
-      <div className="mb-2 text-xs uppercase tracking-wide text-slate-300">Next few days</div>
+      <div className="mb-2 text-xs uppercase tracking-wide text-muted">Next few days</div>
       <div className="grid grid-cols-3 gap-3">
         {days.map((d) => {
           const c = bandClasses[d.band]
@@ -46,16 +46,16 @@ export default function ForecastStrip({ days, unit, onSelect, selectedKey }) {
               onClick={() => onSelect?.(d.key)}
               aria-pressed={isSel}
               className={`rounded-xl border ${c.border} ${c.bg} p-3 text-left transition ${
-                isSel ? 'ring-2 ring-slate-400/60' : 'hover:border-slate-500/60'
+                isSel ? 'ring-2 ring-accent/60' : 'hover:border-muted/60'
               }`}
             >
-              <div className="text-sm font-medium text-slate-100">{dayLabel(d.date)}</div>
+              <div className="text-sm font-medium text-text">{dayLabel(d.date)}</div>
               <div className={`mt-1 flex items-center gap-1.5 text-xs font-semibold ${c.text}`}>
-                <span className={`h-2 w-2 rounded-full ${c.dot}`} aria-hidden />
+                <span aria-hidden>{c.icon}</span>
                 {meta.label}
               </div>
               <MiniSpark hours={d.hours} color={meta.color} />
-              <div className="mt-1 text-[11px] leading-tight text-slate-300">
+              <div className="mt-1 text-[11px] leading-tight text-muted">
                 {swingLabel(d.hours, unit)}
               </div>
             </button>

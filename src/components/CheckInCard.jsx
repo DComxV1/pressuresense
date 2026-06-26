@@ -22,18 +22,18 @@ export default function CheckInCard({ entry, onChange }) {
     onChange({ [field]: list.includes(value) ? list.filter((v) => v !== value) : [...list, value] })
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
-      <div className="text-xs uppercase tracking-wide text-slate-300">Today’s check-in</div>
-      <p className="mt-0.5 text-sm text-slate-300">How are you feeling today?</p>
+    <div className="rounded-2xl border border-border/60 bg-surface p-5">
+      <div className="text-xs uppercase tracking-wide text-muted">Today’s check-in</div>
+      <p className="mt-0.5 text-sm text-muted">How are you feeling today?</p>
 
-      <div className="mt-3 inline-flex overflow-hidden rounded-lg border border-slate-600">
+      <div className="mt-3 inline-flex overflow-hidden rounded-lg border border-border">
         {FELT.map((f) => (
           <button
             key={f.key}
             onClick={() => onChange({ felt: f.key })}
             aria-pressed={felt === f.key}
             className={`px-4 py-1.5 text-sm ${
-              felt === f.key ? 'bg-slate-200 text-slate-900' : 'bg-transparent text-slate-300 hover:bg-slate-700/50'
+              felt === f.key ? 'bg-accent text-white' : 'bg-transparent text-muted hover:bg-surface-2'
             }`}
           >
             {f.label}
@@ -44,7 +44,7 @@ export default function CheckInCard({ entry, onChange }) {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="ml-3 text-sm text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+        className="ml-3 text-sm text-muted underline decoration-border underline-offset-4 hover:text-text"
       >
         {open ? 'Hide detail' : 'Add detail'}
       </button>
@@ -53,10 +53,10 @@ export default function CheckInCard({ entry, onChange }) {
         <div className="mt-4 space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <label htmlFor="pain" className="text-sm text-slate-200">
+              <label htmlFor="pain" className="text-sm text-text">
                 Pain level
               </label>
-              <span className="text-sm tabular-nums text-slate-300">{pain == null ? 'Not set' : `${pain}/10`}</span>
+              <span className="text-sm tabular-nums text-muted">{pain == null ? 'Not set' : `${pain}/10`}</span>
             </div>
             <input
               id="pain"
@@ -67,7 +67,7 @@ export default function CheckInCard({ entry, onChange }) {
               value={pain ?? 0}
               onChange={(e) => onChange({ pain: Number(e.target.value) })}
               aria-valuetext={pain == null ? 'not set' : `${pain} out of 10`}
-              className="mt-2 w-full accent-rose-500"
+              className="mt-2 w-full accent-high"
             />
           </div>
 
@@ -87,7 +87,7 @@ export default function CheckInCard({ entry, onChange }) {
 function TagGroup({ label, tags, active, onToggle }) {
   return (
     <div>
-      <div className="text-sm text-slate-200">{label}</div>
+      <div className="text-sm text-text">{label}</div>
       <div className="mt-2 flex flex-wrap gap-2">
         {tags.map((t) => {
           const on = active.includes(t)
@@ -98,8 +98,8 @@ function TagGroup({ label, tags, active, onToggle }) {
               aria-pressed={on}
               className={`rounded-full border px-2.5 py-1 text-xs transition ${
                 on
-                  ? 'border-sky-400 bg-sky-600 text-white'
-                  : 'border-slate-600 bg-transparent text-slate-300 hover:border-slate-400'
+                  ? 'border-accent bg-accent text-white'
+                  : 'border-border bg-transparent text-muted hover:border-muted'
               }`}
             >
               {t}

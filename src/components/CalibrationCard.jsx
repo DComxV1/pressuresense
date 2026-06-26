@@ -10,13 +10,13 @@ export default function CalibrationCard({ result, onApply }) {
         ? `You've logged ${result.count} days. To find your personal setting, it needs a mix of good and tough days, so keep logging through different weather.`
         : `Auto-calibration kicks in after ${result.need} days of check-ins. You're at ${result.count} of ${result.need}, so keep logging how you feel.`
     return (
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
-        <div className="text-sm font-medium text-slate-100">Personal calibration</div>
-        <p className="mt-1 text-sm text-slate-300">{text}</p>
+      <div className="rounded-2xl border border-border/60 bg-surface p-5">
+        <div className="text-sm font-medium text-text">Personal calibration</div>
+        <p className="mt-1 text-sm text-muted">{text}</p>
         {result.reason !== 'variety' && (
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
             <div
-              className="h-full rounded-full bg-sky-500"
+              className="h-full rounded-full bg-accent"
               style={{ width: `${Math.min(100, (result.count / result.need) * 100)}%` }}
             />
           </div>
@@ -30,34 +30,34 @@ export default function CalibrationCard({ result, onApply }) {
   const same = result.suggested === result.current
 
   return (
-    <div className="rounded-2xl border border-sky-500/40 bg-sky-500/10 p-5">
-      <div className="text-sm font-medium text-slate-100">Personal calibration</div>
-      <p className="mt-1 text-sm text-slate-300">
+    <div className="rounded-2xl border border-accent/40 bg-accent/10 p-5">
+      <div className="text-sm font-medium text-text">Personal calibration</div>
+      <p className="mt-1 text-sm text-muted">
         Based on your {result.count} logged days, your readings best match a sensitivity of{' '}
-        <span className="font-semibold text-slate-100">{result.suggested}</span>
+        <span className="font-semibold text-text">{result.suggested}</span>
         {!same && <> (currently {result.current}).</>}
         {same && <>, which is what you have now.</>}
       </p>
 
-      <div className="mt-3 flex items-center gap-4 text-xs text-slate-300">
+      <div className="mt-3 flex items-center gap-4 text-xs text-muted">
         <span>
-          Match now: <span className="font-semibold text-slate-100">{pct(result.currentAccuracy)}</span>
+          Match now: <span className="font-semibold text-text">{pct(result.currentAccuracy)}</span>
         </span>
         <span aria-hidden>→</span>
         <span>
           Suggested:{' '}
-          <span className={`font-semibold ${improved ? 'text-emerald-300' : 'text-slate-100'}`}>
+          <span className={`font-semibold ${improved ? 'text-good-ink' : 'text-text'}`}>
             {pct(result.suggestedAccuracy)}
           </span>
         </span>
       </div>
 
       {same ? (
-        <p className="mt-3 text-sm text-emerald-300">You’re already well-calibrated to your logs.</p>
+        <p className="mt-3 text-sm text-good-ink">You’re already well-calibrated to your logs.</p>
       ) : (
         <button
           onClick={() => onApply(result.suggested)}
-          className="mt-4 rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500"
+          className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent"
         >
           Use sensitivity {result.suggested}
         </button>

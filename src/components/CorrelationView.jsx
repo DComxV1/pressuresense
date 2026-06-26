@@ -30,9 +30,9 @@ export default function CorrelationView({ history, unit }) {
 
   if (loggedCount < 2) {
     return (
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
-        <div className="text-xs uppercase tracking-wide text-slate-300">Your pattern</div>
-        <p className="mt-2 text-sm text-slate-400">
+      <div className="rounded-2xl border border-border/60 bg-surface p-5">
+        <div className="text-xs uppercase tracking-wide text-muted">Your pattern</div>
+        <p className="mt-2 text-sm text-muted">
           As you log how you feel each day, this chart lays your symptoms over the actual
           pressure, so you can start to see your own pattern. Check back in a few days.
         </p>
@@ -71,16 +71,16 @@ export default function CorrelationView({ history, unit }) {
   const insight = buildInsight(history, unit)
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4">
+    <div className="rounded-2xl border border-border/60 bg-surface p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="text-xs uppercase tracking-wide text-slate-300">Your pattern</div>
-        <div className="inline-flex overflow-hidden rounded-lg border border-slate-600 text-xs">
+        <div className="text-xs uppercase tracking-wide text-muted">Your pattern</div>
+        <div className="inline-flex overflow-hidden rounded-lg border border-border text-xs">
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setDays(r)}
               aria-pressed={days === r}
-              className={`px-2.5 py-1 ${days === r ? 'bg-sky-600 text-white' : 'text-slate-300'}`}
+              className={`px-2.5 py-1 ${days === r ? 'bg-accent text-white' : 'text-muted'}`}
             >
               {r}d
             </button>
@@ -90,12 +90,12 @@ export default function CorrelationView({ history, unit }) {
 
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Pressure versus logged symptoms over time">
         {showComfort && (
-          <rect x={0} y={y(czHigh)} width={W} height={Math.max(0, y(czLow) - y(czHigh))} fill="#16a34a" opacity="0.10" />
+          <rect x={0} y={y(czHigh)} width={W} height={Math.max(0, y(czLow) - y(czHigh))} fill="rgb(var(--good))" opacity="0.10" />
         )}
         {/* pressure line + points */}
-        {path && <path d={path} fill="none" stroke="#94a3b8" strokeWidth="1.5" />}
+        {path && <path d={path} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" />}
         {withP.map((p, k) => (
-          <circle key={k} cx={x(p.i)} cy={y(p.entry.minPressure)} r="2.5" fill="#cbd5e1">
+          <circle key={k} cx={x(p.i)} cy={y(p.entry.minPressure)} r="2.5" fill="rgb(var(--muted))">
             <title>
               {p.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} ·{' '}
               {formatPressure(p.entry.minPressure, unit)}
@@ -117,13 +117,13 @@ export default function CorrelationView({ history, unit }) {
         })}
       </svg>
 
-      <div className="flex justify-between text-[11px] text-slate-400">
+      <div className="flex justify-between text-[11px] text-muted">
         <span>pressure line · low {formatPressure(min, unit)}</span>
         <span>● symptoms below</span>
       </div>
 
       {insight && (
-        <p className="mt-3 rounded-lg bg-slate-900/40 p-3 text-sm leading-relaxed text-slate-200">{insight}</p>
+        <p className="mt-3 rounded-lg bg-surface-2 p-3 text-sm leading-relaxed text-text">{insight}</p>
       )}
     </div>
   )

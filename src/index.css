@@ -2,7 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Design tokens (per the accessibility addendum). Colors are stored as
+  space-separated RGB triplets so Tailwind's opacity modifiers (e.g. bg-surface/40)
+  keep working via rgb(var(--x) / <alpha-value>).
+
+  Default is the LIGHT theme — easier for older eyes; dark mode can "bloom" for
+  cataracts/astigmatism. Dark stays available via [data-theme="dark"].
+*/
 :root {
+  --bg: 247 249 251; /* #F7F9FB soft off-white, less glare than pure white */
+  --surface: 255 255 255; /* cards */
+  --surface-2: 239 243 246; /* inputs / insets */
+  --border: 217 225 232; /* #D9E1E8 */
+  --text: 26 42 51; /* #1A2A33 charcoal, softer than pure black */
+  --muted: 74 90 99; /* #4A5A63 — still clears WCAG AA */
+  --accent: 45 106 159; /* #2D6A9F trust blue */
+
+  /* Risk bands: teal -> amber -> red-orange (NOT green/red), so red-green
+     colorblind users can still tell them apart. Each band also gets an icon
+     and a text label elsewhere — never hue alone. */
+  --good: 46 139 127; /* #2E8B7F fill/dot */
+  --caution: 224 160 48; /* #E0A030 */
+  --high: 214 84 58; /* #D6543A */
+  /* "ink" = a darker shade of each band for text/icons that must clear AA */
+  --good-ink: 27 102 91; /* #1B665B */
+  --caution-ink: 138 90 18; /* #8A5A12 */
+  --high-ink: 168 59 39; /* #A83B27 */
+
+  color-scheme: light;
+  font-size: 18px; /* larger base for the audience; text-size control scales this */
+}
+
+[data-theme='dark'] {
+  --bg: 16 26 36; /* #101A24 */
+  --surface: 24 36 47; /* #18242F */
+  --surface-2: 30 44 56;
+  --border: 42 58 71; /* #2A3A47 */
+  --text: 234 240 244; /* #EAF0F4 */
+  --muted: 167 182 192; /* #A7B6C0 brighter than the old build, clears AA */
+  --accent: 91 155 213; /* #5B9BD5 lightened for dark bg */
+
+  --good: 63 176 161; /* #3FB0A1 */
+  --caution: 240 184 74; /* #F0B84A */
+  --high: 232 105 77; /* #E8694D */
+  /* on dark surfaces the band colors are already light enough for text */
+  --good-ink: 63 176 161;
+  --caution-ink: 240 184 74;
+  --high-ink: 232 105 77;
+
   color-scheme: dark;
 }
 
@@ -14,8 +62,10 @@ body,
 
 body {
   margin: 0;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: rgb(var(--bg));
+  color: rgb(var(--text));
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 450;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }

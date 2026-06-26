@@ -6,15 +6,15 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
   return (
     <div
       className={`rounded-2xl border p-5 ${
-        onboarding ? 'border-sky-500/50 bg-sky-500/10' : 'border-slate-700/60 bg-slate-800/40'
+        onboarding ? 'border-accent/50 bg-accent/10' : 'border-border/60 bg-surface'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-slate-100">
+          <div className="text-sm font-medium text-text">
             {onboarding ? 'Personalize your coaching' : 'Your conditions'}
           </div>
-          <p className="mt-0.5 text-xs text-slate-300">
+          <p className="mt-0.5 text-xs text-muted">
             {onboarding
               ? 'Pick what applies so tips match how pressure affects you. You can change this anytime.'
               : 'Tips are tailored to these.'}
@@ -23,7 +23,7 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
         {onboarding && (
           <button
             onClick={onDismiss}
-            className="shrink-0 text-xs text-slate-300 underline underline-offset-4 hover:text-slate-100"
+            className="shrink-0 text-xs text-muted underline underline-offset-4 hover:text-text"
           >
             Skip
           </button>
@@ -41,8 +41,8 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
               title={c.blurb}
               className={`rounded-full border px-3 py-1.5 text-sm transition ${
                 on
-                  ? 'border-sky-400 bg-sky-600 text-white'
-                  : 'border-slate-600 bg-transparent text-slate-200 hover:border-slate-400'
+                  ? 'border-accent bg-accent text-white'
+                  : 'border-border bg-transparent text-text hover:border-muted'
               }`}
             >
               {on ? '✓ ' : ''}

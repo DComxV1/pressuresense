@@ -38,10 +38,10 @@ export default function HourlyChart({ day, unit }) {
   const presentBands = [...new Set(hours.map((h) => h.band))]
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4">
-      <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-wide text-slate-300">
+    <div className="rounded-2xl border border-border/60 bg-surface p-4">
+      <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-wide text-muted">
         <span>Hourly pressure</span>
-        <span className="text-slate-400">
+        <span className="text-muted">
           {hourLabel(hours[0].time)} – {hourLabel(hours[hours.length - 1].time)}
         </span>
       </div>
@@ -60,10 +60,10 @@ export default function HourlyChart({ day, unit }) {
               y={y(czHigh)}
               width={W}
               height={Math.max(0, y(czLow) - y(czHigh))}
-              fill="#16a34a"
+              fill="rgb(var(--good))"
               opacity="0.10"
             />
-            <text x={W - 4} y={y(czHigh) + 10} textAnchor="end" fontSize="8" fill="#34d399">
+            <text x={W - 4} y={y(czHigh) + 10} textAnchor="end" fontSize="8" fill="rgb(var(--good-ink))">
               comfort zone
             </text>
           </g>
@@ -93,7 +93,7 @@ export default function HourlyChart({ day, unit }) {
           </g>
         )}
 
-        <path d={path} fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+        <path d={path} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" />
 
         {hours.map((h, i) => (
           <circle
@@ -102,7 +102,7 @@ export default function HourlyChart({ day, unit }) {
             cy={y(h.hPa)}
             r={i === peakIdx && showPeak ? 4 : 2.5}
             fill={BAND_META[h.band].color}
-            stroke={i === peakIdx && showPeak ? '#0f172a' : 'none'}
+            stroke={i === peakIdx && showPeak ? 'rgb(var(--surface))' : 'none'}
             strokeWidth="1.5"
           >
             <title>
@@ -114,7 +114,7 @@ export default function HourlyChart({ day, unit }) {
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
         {presentBands.map((b) => (
-          <span key={b} className="flex items-center gap-1.5 text-[11px] text-slate-300">
+          <span key={b} className="flex items-center gap-1.5 text-[11px] text-muted">
             <span
               className="h-2 w-2 rounded-full"
               style={{ background: BAND_META[b].color }}
@@ -123,7 +123,7 @@ export default function HourlyChart({ day, unit }) {
             {BAND_META[b].label}
           </span>
         ))}
-        <span className="ml-auto text-[11px] text-slate-400">low {formatPressure(day.minPressure, unit)}</span>
+        <span className="ml-auto text-[11px] text-muted">low {formatPressure(day.minPressure, unit)}</span>
       </div>
     </div>
   )

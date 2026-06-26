@@ -1,25 +1,30 @@
-// Tailwind-friendly class sets keyed to risk band.
+// Band styling, token-based. Risk hue runs teal -> amber -> red-orange (not
+// green/red) so red-green colorblind users can tell the bands apart. Every band
+// also carries an icon and a text label, so hue is never the only signal.
 export const bandClasses = {
   green: {
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/40',
-    text: 'text-emerald-400',
-    dot: 'bg-emerald-500',
-    solid: 'bg-emerald-600',
+    bg: 'bg-good/10',
+    border: 'border-good/40',
+    text: 'text-good-ink',
+    dot: 'bg-good',
+    solid: 'bg-good',
+    icon: '✓',
   },
   yellow: {
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/40',
-    text: 'text-amber-400',
-    dot: 'bg-amber-500',
-    solid: 'bg-amber-600',
+    bg: 'bg-caution/10',
+    border: 'border-caution/40',
+    text: 'text-caution-ink',
+    dot: 'bg-caution',
+    solid: 'bg-caution',
+    icon: '⚠',
   },
   red: {
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/40',
-    text: 'text-red-400',
-    dot: 'bg-red-500',
-    solid: 'bg-red-600',
+    bg: 'bg-high/10',
+    border: 'border-high/40',
+    text: 'text-high-ink',
+    dot: 'bg-high',
+    solid: 'bg-high',
+    icon: '◆',
   },
 }
 

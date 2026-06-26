@@ -31,7 +31,8 @@ npm run preview  # serve the production build
 - **Daily check-in** — a quick Good / So-so / Painful, with optional detail: a 1–10 pain level plus joint-location and symptom tags (swelling, stiffness, fatigue, brain fog…).
 - **Flare log** — mark a rough day and tag what helped; over time it builds a ranked, personal "what works for me" list and a history of past flares with notes.
 - **Learn (education library)** — short, condition-keyed explainers (calf-pump/swelling, gentle mobility in a flare, heat-vs-ice, anti-inflammatory basics, sleep & pain); the ones matching your conditions surface first, flagged "For you".
-- **Encouraging tone by design** — warnings always pair with agency ("a tougher day — plan a gentler day", never "high pain warning"), and good days and good streaks get celebrated ("5 good days in a row — pressure's been kind").
+- **Encouraging tone by design** — warnings always pair with agency ("a tougher day, plan a gentler day", never "high pain warning"), and good days and good streaks get celebrated ("5 good days in a row, the weather's been kind").
+- **Accessible by design** — light theme by default (with a dark toggle), a colorblind-safe band palette (teal / amber / red-orange, each with a color + text label + icon, never hue alone), WCAG-AA contrast, an 18px base with a text-size control (A / A+ / A++), and 44px+ tap targets. Built on a CSS-variable design-token system (`src/index.css` + `tailwind.config.js`).
 - **Correlation view ("Your pattern")** — a 7/14/30-day chart overlaying actual pressure against your logged symptoms, with a plain-language insight (e.g. "painful days averaged 29.54 inHg vs 30.08 on good days") so you can see your own pattern confirmed.
 - **History log** — records each day's prediction and check-in detail so you can validate the model over time.
 - **Location** — city search or device geolocation (reverse-geocoded to a place name).

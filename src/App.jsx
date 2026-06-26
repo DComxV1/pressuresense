@@ -40,12 +40,22 @@ export default function App() {
   const [history, setHistory] = useState(loadHistory)
   const [selectedKey, setSelectedKey] = useState(null)
 
-  const { unit, sensitivity, location, conditions, onboarded, includeWeather } = settings
+  const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize } =
+    settings
   const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
   const showOnboarding = !onboarded && (conditions || []).length === 0
 
   // Persist settings whenever they change.
   useEffect(() => saveSettings(settings), [settings])
+
+  // Apply theme + text size to the document root.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light')
+  }, [theme])
+  useEffect(() => {
+    const px = { default: '18px', large: '20px', xl: '22px' }[textSize] || '18px'
+    document.documentElement.style.fontSize = px
+  }, [textSize])
 
   // Fetch pressure whenever the location changes.
   useEffect(() => {
@@ -141,8 +151,8 @@ export default function App() {
   return (
     <div className="mx-auto min-h-full max-w-md px-4 pb-16 pt-6">
       <header className="mb-5">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">PressureSense</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-bold tracking-tight text-text">PressureSense</h1>
+        <p className="text-sm text-muted">
           A gentle heads-up on how today might feel, and easy things that help.
         </p>
       </header>
@@ -165,13 +175,13 @@ export default function App() {
         )}
 
         {status === 'loading' && (
-          <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-8 text-center text-sm text-slate-400">
+          <div className="rounded-2xl border border-border/60 bg-surface p-8 text-center text-sm text-muted">
             Loading pressure data…
           </div>
         )}
 
         {status === 'error' && (
-          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-5 text-sm text-red-300">
+          <div className="rounded-2xl border border-high/40 bg-high/10 p-5 text-sm text-high-ink">
             Couldn’t load data: {error}
           </div>
         )}
@@ -215,6 +225,10 @@ export default function App() {
           onUnit={(u) => update({ unit: u })}
           includeWeather={!!includeWeather}
           onIncludeWeather={(v) => update({ includeWeather: v })}
+          theme={theme || 'light'}
+          onTheme={(t) => update({ theme: t })}
+          textSize={textSize || 'default'}
+          onTextSize={(t) => update({ textSize: t })}
         />
 
         {!showOnboarding && (
@@ -238,7 +252,7 @@ export default function App() {
 
 function Disclaimer() {
   return (
-    <p className="px-1 text-[11px] leading-relaxed text-slate-400">
+    <p className="px-1 text-[11px] leading-relaxed text-muted">
       The link between pressure and pain is real for a lot of people, but it’s individual, and
       this is general wellness guidance, not medical advice or a diagnosis. Swelling and pain
       that stick around or keep coming back, especially in the ankles, can have causes that
