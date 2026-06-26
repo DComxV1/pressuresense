@@ -112,7 +112,9 @@ async function sendPush(subscription, payload, env) {
     },
     body,
   })
-  return res.status
+  let detail = ''
+  if (res.status >= 300) detail = (await res.text().catch(() => '')).slice(0, 300)
+  return { status: res.status, detail }
 }
 
 // ---------- risk model (compact port of src/lib/risk.js, pressure-only) ----------
@@ -216,7 +218,7 @@ export default {
     if (request.method === 'POST' && url.pathname === '/test') {
       const data = await request.json().catch(() => null)
       if (!data?.subscription?.endpoint) return json({ error: 'missing subscription' }, 400)
-      const status = await sendPush(
+      const r = await sendPush(
         data.subscription,
         JSON.stringify({
           title: 'PressureSense',
@@ -225,7 +227,8 @@ export default {
         }),
         env,
       )
-      return json({ ok: status >= 200 && status < 300, status })
+      console.log('test push ->', r.status, r.detail)
+      return json({ ok: r.status >= 200 && r.status < 300, status: r.status, detail: r.detail })
     }
 
     if (request.method === 'POST' && url.pathname === '/unsubscribe') {
@@ -264,7 +267,7 @@ export default {
         if (sub[lastKey] === f.targetDate) continue
 
         const m = buildMessage(f.band, f.isToday)
-        const status = await sendPush(
+        const { status } = await sendPush(
           sub.subscription,
           JSON.stringify({ title: m.title, body: m.body, url: env.APP_URL }),
           env,

@@ -89,7 +89,11 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
   async function test() {
     setTestMsg('Sending…')
     const r = await sendServerTest()
-    setTestMsg(r?.ok ? 'Sent — check your notifications.' : `Couldn’t send (status ${r?.status || '?'}).`)
+    if (r?.ok) {
+      setTestMsg('Sent. If you don’t see it, swipe to the Home Screen and check — iOS often hides the banner while the app is open.')
+    } else {
+      setTestMsg(`Couldn’t send (status ${r?.status || '?'}${r?.detail ? `: ${r.detail}` : ''}).`)
+    }
   }
 
   async function install() {
