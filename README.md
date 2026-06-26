@@ -25,6 +25,7 @@ npm run preview  # serve the production build
 - **3-day forecast strip** — each day rated GREEN / YELLOW / RED, with a mini sparkline and the day's pressure **swing** (the change matters more than the floor).
 - **Hourly chart** for the selected day: dots colored by hourly risk (with a text legend), a shaded **comfort-zone** band, and the **peak-risk hour** marked on the curve.
 - **Sensitivity slider** — calibrates when the model tips into YELLOW/RED (pressure sensitivity is individual).
+- **Self-calibration** — after ~2 weeks of check-ins, suggests the sensitivity that best fits *your own* logged days (replaying each day's sensitivity-independent score against how you felt) and applies it in one tap. This is the core differentiator vs. generic barometer apps.
 - **Condition selector** — pick conditions (osteoarthritis, rheumatoid/inflammatory, fibromyalgia, gout, old injury); the tip engine swaps in mechanism-specific coaching for each.
 - **Daily check-in** — a quick Good / So-so / Painful, with optional detail: a 1–10 pain level plus joint-location and symptom tags (swelling, stiffness, fatigue, brain fog…).
 - **Correlation view ("Your pattern")** — a 7/14/30-day chart overlaying actual pressure against your logged symptoms, with a plain-language insight (e.g. "painful days averaged 29.54 inHg vs 30.08 on good days") so you can see your own pattern confirmed.

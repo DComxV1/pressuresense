@@ -3,6 +3,7 @@ import { fetchPressureSeries, reverseGeocode } from './lib/weather.js'
 import { computeHourlyRisk, currentConditions, dailyForecast } from './lib/risk.js'
 import { buildBriefing, tipsFor, buildExplanation } from './lib/tips.js'
 import { CONDITION_MAP } from './lib/conditions.js'
+import { suggestSensitivity } from './lib/calibrate.js'
 import {
   loadSettings,
   saveSettings,
@@ -19,6 +20,7 @@ import Controls from './components/Controls.jsx'
 import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
 import CorrelationView from './components/CorrelationView.jsx'
+import CalibrationCard from './components/CalibrationCard.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
 
@@ -83,6 +85,11 @@ export default function App() {
       recordPrediction(model.today.key, model.today.band, model.today.score, model.today.minPressure),
     )
   }, [model?.today?.key, model?.today?.band])
+
+  const calibration = useMemo(
+    () => suggestSensitivity(history, sensitivity),
+    [history, sensitivity],
+  )
 
   const update = (patch) => setSettings((s) => ({ ...s, ...patch }))
 
@@ -179,6 +186,8 @@ export default function App() {
         )}
 
         {status === 'ready' && <CheckInCard entry={todayEntry} onChange={onCheckIn} />}
+
+        <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
         <Controls
           sensitivity={sensitivity}
