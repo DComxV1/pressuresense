@@ -20,12 +20,13 @@ npm run preview  # serve the production build
 
 ## What it does
 
-- **Today's briefing** — plain-language summary of the day's risk band + the top mitigation tips.
-- **Current pressure** with a rising/falling/steady trend arrow and an inHg ⇄ hPa toggle.
-- **3-day forecast strip** — each day rated GREEN / YELLOW / RED, with the day's pressure low and the time of the steepest drop.
-- **Hourly chart** for the selected day, dots colored by hourly risk.
+- **Today's briefing** — plain-language summary of the day's risk band + the top mitigation tips, with a **"Why this rating?"** explainer that shows the pressure reasoning.
+- **Current pressure** — numbers + a *now* trend and a **forward-looking** outlook ("dropping after 3 PM"), with an inHg ⇄ hPa toggle.
+- **3-day forecast strip** — each day rated GREEN / YELLOW / RED, with a mini sparkline and the day's pressure **swing** (the change matters more than the floor).
+- **Hourly chart** for the selected day: dots colored by hourly risk (with a text legend), a shaded **comfort-zone** band, and the **peak-risk hour** marked on the curve.
 - **Sensitivity slider** — calibrates when the model tips into YELLOW/RED (pressure sensitivity is individual).
-- **History log** — records each day's prediction so you can mark how you *actually* felt and validate the model over time.
+- **7-day correlation strip + history log** — records each day's prediction so you can mark how you *actually* felt; the strip shows predicted-vs-felt side by side to validate the model over time.
+- **Location** — city search or device geolocation (reverse-geocoded to a place name).
 
 ## How the risk model works
 

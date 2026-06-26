@@ -17,6 +17,7 @@ export default function Controls({ sensitivity, onSensitivity, unit, onUnit }) {
         step="5"
         value={sensitivity}
         onChange={(e) => onSensitivity(Number(e.target.value))}
+        aria-valuetext={`${sensLabel(sensitivity)} sensitivity`}
         className="mt-3 w-full accent-sky-500"
       />
       <div className="mt-1 flex justify-between text-[11px] text-slate-500">
@@ -31,6 +32,8 @@ export default function Controls({ sensitivity, onSensitivity, unit, onUnit }) {
             <button
               key={u}
               onClick={() => onUnit(u)}
+              aria-pressed={unit === u}
+              aria-label={`Show pressure in ${u}`}
               className={`px-3 py-1 text-sm ${
                 unit === u ? 'bg-sky-600 text-white' : 'bg-transparent text-slate-300'
               }`}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { fetchPressureSeries } from './lib/weather.js'
+import { fetchPressureSeries, reverseGeocode } from './lib/weather.js'
 import { computeHourlyRisk, currentConditions, dailyForecast } from './lib/risk.js'
-import { buildBriefing, tipsForBand } from './lib/tips.js'
+import { buildBriefing, tipsForBand, buildExplanation } from './lib/tips.js'
 import {
   loadSettings,
   saveSettings,
@@ -17,6 +17,7 @@ import HourlyChart from './components/HourlyChart.jsx'
 import Controls from './components/Controls.jsx'
 import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
+import CorrelationStrip from './components/CorrelationStrip.jsx'
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -66,8 +67,9 @@ export default function App() {
     const days = dailyForecast(scored, now, 3)
     const today = days[0] || null
     const briefing = buildBriefing(today, current)
-    return { scored, current, days, today, briefing }
-  }, [series, sensitivity])
+    const explanation = buildExplanation(today, current, unit)
+    return { scored, current, days, today, briefing, explanation }
+  }, [series, sensitivity, unit])
 
   // Log today's prediction once we have a model.
   useEffect(() => {
@@ -84,15 +86,10 @@ export default function App() {
     }
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const { latitude, longitude } = pos.coords
-        update({
-          location: {
-            label: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`,
-            latitude,
-            longitude,
-          },
-        })
+        const label = await reverseGeocode(latitude, longitude)
+        update({ location: { label, latitude, longitude } })
         setLocating(false)
       },
       (err) => {
@@ -137,7 +134,11 @@ export default function App() {
 
         {status === 'ready' && model && (
           <>
-            <BriefingCard briefing={model.briefing} tips={tipsForBand(model.today?.band || 'green')} />
+            <BriefingCard
+              briefing={model.briefing}
+              tips={tipsForBand(model.today?.band || 'green')}
+              explanation={model.explanation}
+            />
             <CurrentCard current={model.current} unit={unit} />
             <ForecastStrip
               days={model.days}
@@ -156,6 +157,8 @@ export default function App() {
           onUnit={(u) => update({ unit: u })}
         />
 
+        <CorrelationStrip history={history} />
+
         <HistoryView
           history={history}
           onFelt={(dateKey, felt) => setHistory(recordFelt(dateKey, felt))}
@@ -169,7 +172,7 @@ export default function App() {
 
 function Disclaimer() {
   return (
-    <p className="px-1 text-[11px] leading-relaxed text-slate-500">
+    <p className="px-1 text-[11px] leading-relaxed text-slate-400">
       The pressure–pain link is real for many people but individual, and this is general
       wellness guidance, not medical advice or a diagnosis. Persistent or recurrent swelling
       and pain — ankle swelling in particular — can have causes unrelated to weather and is

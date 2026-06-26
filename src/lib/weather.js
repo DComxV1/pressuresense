@@ -28,10 +28,23 @@ export async function geocode(query) {
   }))
 }
 
-// Reverse-friendly label for a coordinate (used after browser geolocation).
-export async function describeCoords(lat, lon) {
-  // Open-Meteo has no reverse geocode; just present coordinates.
-  return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+// Turn a coordinate into a place name (used after browser geolocation).
+// Open-Meteo has no reverse geocode, so this uses BigDataCloud's free,
+// keyless, CORS-enabled client endpoint. Falls back to coordinates on failure.
+export async function reverseGeocode(lat, lon) {
+  const coords = `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+  try {
+    const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+    const res = await fetch(url)
+    if (!res.ok) return coords
+    const d = await res.json()
+    const place = d.city || d.locality || d.principalSubdivision
+    const region = d.principalSubdivisionCode?.split('-')?.[1] || d.principalSubdivision
+    const label = [place, region].filter(Boolean).join(', ')
+    return label || coords
+  } catch {
+    return coords
+  }
 }
 
 // Fetch hourly barometric pressure spanning ~1 day past to 3 days ahead.

@@ -16,6 +16,7 @@ export const DEFAULT_CONFIG = {
   // Absolute pressure factor (hPa). 0 = comfortable, 1 = bad.
   absolute: {
     comfortableMin: 1013, // at/above this -> 0 risk (comfort zone 1013-1023)
+    comfortableMax: 1023, // upper edge of the comfort zone (for the chart band)
     severeLow: 996, // at/below this -> full absolute risk
   },
   // Rate-of-change factor: pressure change over a trailing 6h window (hPa/6h).
@@ -92,7 +93,7 @@ export function computeHourlyRisk(hourly, sensitivity = 50, cfg = DEFAULT_CONFIG
 const BAND_RANK = { green: 0, yellow: 1, red: 2 }
 
 // Current conditions: the sample nearest to `now`, plus a short-term trend.
-export function currentConditions(scored, now = new Date()) {
+export function currentConditions(scored, now = new Date(), cfg = DEFAULT_CONFIG) {
   if (!scored.length) return null
   let nearest = 0
   let best = Infinity
@@ -104,7 +105,7 @@ export function currentConditions(scored, now = new Date()) {
     }
   })
   const cur = scored[nearest]
-  // 3h trend for the arrow.
+  // 3h trend for the arrow (where pressure has just been).
   const prev = scored[nearest - 3]
   let trend = 'steady'
   let trend3h = null
@@ -113,7 +114,27 @@ export function currentConditions(scored, now = new Date()) {
     if (trend3h > 0.4) trend = 'rising'
     else if (trend3h < -0.4) trend = 'falling'
   }
-  return { ...cur, index: nearest, trend, trend3h }
+
+  // Forward-looking outlook: scan the next ~12h for the onset of a notable
+  // fall, so the UI can say "dropping after 3 PM" rather than only the past.
+  const horizon = Math.min(scored.length - 1, nearest + 12)
+  const ahead6h = scored[nearest + 6]
+  const change6h = ahead6h ? ahead6h.hPa - cur.hPa : null
+  let forward = { trend: 'steady', startHour: null, change6h }
+  for (let k = nearest + 1; k <= horizon; k++) {
+    const end = scored[Math.min(k + 6, horizon)]
+    const window = end.hPa - scored[k].hPa
+    if (window <= cfg.rate.meaningfulDrop) {
+      forward = { trend: 'dropping', startHour: scored[k].time, change6h }
+      break
+    }
+  }
+  if (forward.trend === 'steady' && change6h != null) {
+    if (change6h >= 1.5) forward.trend = 'rising'
+    else if (change6h <= -1.5) forward.trend = 'dropping'
+  }
+
+  return { ...cur, index: nearest, trend, trend3h, forward }
 }
 
 // Group future hours into per-day summaries with a worst-case rating.

@@ -4,7 +4,7 @@
 // and mirror the real mechanisms: calf-muscle pump for venous return (ankle
 // swelling), staying ahead of inflammation rather than reacting to it.
 
-import { hourLabel } from './format.js'
+import { hourLabel, hPaToInHg } from './format.js'
 
 export const BAND_META = {
   green: {
@@ -99,4 +99,40 @@ function leadAction(band) {
 export function tipsForBand(band, count = 4) {
   const all = TIPS[band] || TIPS.green
   return all.slice(0, count)
+}
+
+// Plain-language "why this rating?" — explains the pressure reasoning so the
+// user learns their own pattern and trusts the forecast.
+export function buildExplanation(today, current, unit = 'inHg') {
+  if (!today) return 'Not enough forecast data to explain the rating yet.'
+  const fmt = (hPa) =>
+    unit === 'inHg' ? `${hPaToInHg(hPa).toFixed(2)} inHg` : `${Math.round(hPa)} hPa`
+  const reasons = []
+
+  // Rate of change is the headline driver.
+  if (today.steepestRate != null && today.steepestRate <= -1.5) {
+    reasons.push(
+      `Pressure falls about ${Math.abs(today.steepestRate).toFixed(1)} hPa over 6 hours${
+        today.steepestRateHour ? ` around ${hourLabel(today.steepestRateHour)}` : ''
+      } — a falling trend is the strongest pain trigger, which is why this weighs heaviest.`,
+    )
+  } else if (today.steepestRate != null && today.steepestRate > 0.5) {
+    reasons.push('Pressure is holding or rising through the day, which tends to bring relief.')
+  } else {
+    reasons.push('Pressure stays fairly flat through the day — little movement to provoke a flare.')
+  }
+
+  // Absolute level.
+  if (today.minPressure < 1009) {
+    reasons.push(`It also dips to a low of ${fmt(today.minPressure)}, below the comfortable zone.`)
+  } else if (today.minPressure >= 1013) {
+    reasons.push(`The day's low stays at ${fmt(today.minPressure)}, inside the comfortable zone.`)
+  }
+
+  // Current direction.
+  if (current?.forward?.trend === 'dropping' && current.forward.startHour) {
+    reasons.push(`The drop begins after ${hourLabel(current.forward.startHour)} — act before then.`)
+  }
+
+  return reasons.join(' ')
 }
