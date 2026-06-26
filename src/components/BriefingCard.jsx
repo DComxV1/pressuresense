@@ -12,7 +12,7 @@ export default function BriefingCard({ briefing, tips, explanation }) {
     <div className={`rounded-2xl border ${c.border} ${c.bg} p-5`}>
       <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-300">
         <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
-        Today’s briefing — {label}
+        Today’s briefing · {label}
       </div>
       <p className="mt-2 text-lg font-medium leading-snug text-slate-100">{briefing.text}</p>
       {tips?.length > 0 && (

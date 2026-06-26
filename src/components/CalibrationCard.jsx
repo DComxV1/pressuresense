@@ -1,4 +1,4 @@
-// A4 — self-calibration UI. Suggests a sensitivity tuned to the user's own
+// A4: self-calibration UI. Suggests a sensitivity tuned to the user's own
 // logged days, with one-tap apply. Shows progress before it's ready.
 
 export default function CalibrationCard({ result, onApply }) {
@@ -7,8 +7,8 @@ export default function CalibrationCard({ result, onApply }) {
   if (!result.ready) {
     const text =
       result.reason === 'variety'
-        ? `Logged ${result.count} days. Calibration needs a mix of good and tough days to find your personal setting — keep logging through different weather.`
-        : `Auto-calibration unlocks after ${result.need} days of check-ins. You're at ${result.count}/${result.need} — keep logging how you feel.`
+        ? `You've logged ${result.count} days. To find your personal setting, it needs a mix of good and tough days, so keep logging through different weather.`
+        : `Auto-calibration kicks in after ${result.need} days of check-ins. You're at ${result.count} of ${result.need}, so keep logging how you feel.`
     return (
       <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
         <div className="text-sm font-medium text-slate-100">Personal calibration</div>
@@ -36,7 +36,7 @@ export default function CalibrationCard({ result, onApply }) {
         Based on your {result.count} logged days, your readings best match a sensitivity of{' '}
         <span className="font-semibold text-slate-100">{result.suggested}</span>
         {!same && <> (currently {result.current}).</>}
-        {same && <> — which is what you have now.</>}
+        {same && <>, which is what you have now.</>}
       </p>
 
       <div className="mt-3 flex items-center gap-4 text-xs text-slate-300">

@@ -3,7 +3,7 @@ import { BAND_META } from '../lib/tips.js'
 import { DEFAULT_CONFIG } from '../lib/risk.js'
 import { formatPressure, hPaToInHg } from '../lib/format.js'
 
-// A3 — overlay logged symptoms against actual pressure over time. Seeing your
+// A3: overlay logged symptoms against actual pressure over time. Seeing your
 // own pattern confirmed is the trust/retention payoff. Pressure line on top,
 // felt-rating dots underneath, plus a plain-language insight.
 
@@ -33,8 +33,8 @@ export default function CorrelationView({ history, unit }) {
       <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
         <div className="text-xs uppercase tracking-wide text-slate-300">Your pattern</div>
         <p className="mt-2 text-sm text-slate-400">
-          As you log how you feel each day, this chart overlays your symptoms on the actual
-          pressure — so you can see your own pattern confirmed. Check back after a few days.
+          As you log how you feel each day, this chart lays your symptoms over the actual
+          pressure, so you can start to see your own pattern. Check back in a few days.
         </p>
       </div>
     )
@@ -133,12 +133,12 @@ export default function CorrelationView({ history, unit }) {
 function buildInsight(history, unit) {
   const rows = history.filter((h) => h.minPressure != null && h.felt)
   if (rows.length < 4) {
-    return 'Keep logging — a few more days and this will start showing whether low pressure lines up with your pain.'
+    return 'Keep logging. In a few more days this will start to show whether low pressure lines up with your pain.'
   }
   const bad = rows.filter((r) => r.felt === 'bad')
   const good = rows.filter((r) => r.felt === 'good')
   if (!bad.length || !good.length) {
-    return `Logged ${rows.length} days so far. Keep going — once you have a mix of good and painful days, the pattern will show here.`
+    return `Logged ${rows.length} days so far. Keep going. Once you've got a mix of good and painful days, the pattern will show up here.`
   }
   const avg = (xs) => xs.reduce((s, r) => s + r.minPressure, 0) / xs.length
   const badAvg = avg(bad)
@@ -146,14 +146,14 @@ function buildInsight(history, unit) {
   const fmt = (hPa) => (unit === 'inHg' ? `${hPaToInHg(hPa).toFixed(2)} inHg` : `${Math.round(hPa)} hPa`)
   const gap = goodAvg - badAvg
   if (gap >= 1) {
-    return `Your pattern is showing: painful days averaged ${fmt(badAvg)} vs ${fmt(
+    return `Your pattern is coming through. Your painful days averaged ${fmt(badAvg)}, versus ${fmt(
       goodAvg,
-    )} on good days — lower pressure lined up with more pain, just as expected.`
+    )} on the good ones. Lower pressure really has lined up with more pain, just like you'd expect.`
   }
   if (gap <= -1) {
-    return `Interesting — so far your painful days haven't been the lower-pressure ones (${fmt(
+    return `Here's something interesting. So far your painful days haven't been the lower-pressure ones (${fmt(
       badAvg,
-    )} vs ${fmt(goodAvg)} on good days). Pressure may not be your main driver; keep logging.`
+    )} versus ${fmt(goodAvg)} on good days). Pressure might not be your main trigger, so keep logging.`
   }
-  return `Across ${rows.length} logged days, pressure on good vs painful days is about the same so far — no strong pressure link yet. Keep logging.`
+  return `Across ${rows.length} logged days, the pressure on your good and painful days has been about the same, so there's no clear link yet. Keep logging.`
 }

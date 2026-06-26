@@ -7,7 +7,7 @@ const FELT = [
   { key: 'bad', label: 'Painful' },
 ]
 
-// Log of predicted bands vs. how the user actually felt — the validation loop
+// Log of predicted bands vs. how the user actually felt. The validation loop
 // that lets the model get tuned to a real person over a couple of weeks.
 export default function HistoryView({ history, onFelt }) {
   if (!history?.length) {
@@ -21,7 +21,7 @@ export default function HistoryView({ history, onFelt }) {
   return (
     <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-4">
       <div className="mb-3 text-xs uppercase tracking-wide text-slate-400">
-        History — predicted vs. how you felt
+        Past days, and how you actually felt
       </div>
       <ul className="space-y-2">
         {history.map((h) => {

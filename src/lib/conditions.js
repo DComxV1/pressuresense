@@ -10,7 +10,7 @@ export const CONDITIONS = [
       green: ['Good day for low-impact activity and range-of-motion work.'],
       yellow: [
         'Do gentle range-of-motion before activity.',
-        'Keep moving in short bursts — stillness stiffens OA fast.',
+        'Keep moving in short bursts. Sitting still stiffens OA up fast.',
         'Apply warmth to the stiff joint.',
       ],
       red: [
@@ -34,23 +34,23 @@ export const CONDITIONS = [
       red: [
         'Don’t overexert on a flare day.',
         'Prioritize rest balanced with gentle movement.',
-        'Stay ahead of inflammation early — don’t wait for it.',
+        'Stay ahead of the inflammation early. Don’t wait for it.',
       ],
     },
   },
   {
     key: 'fibromyalgia',
     label: 'Fibromyalgia',
-    blurb: 'Pain amplification, fatigue, and fog — drops hit energy too.',
+    blurb: 'Heightened pain, fatigue, and fog. Pressure drops hit your energy too.',
     tips: {
-      green: ['Pace yourself — don’t burn all your energy and crash tomorrow.'],
+      green: ['Pace yourself so you don’t burn through your energy and crash tomorrow.'],
       yellow: [
         'Pace activity; spread tasks across the day.',
         'Gentle stretching.',
         'Protect your sleep tonight.',
       ],
       red: [
-        'Conserve energy — plan a low-demand day.',
+        'Conserve your energy and plan an easy, low-demand day.',
         'Gentle stretching and stress regulation.',
         'Protect sleep and rest proactively before the crash.',
       ],
@@ -75,7 +75,7 @@ export const CONDITIONS = [
     label: 'Old injury / post-surgical',
     blurb: 'Localized weather sensitivity.',
     tips: {
-      green: ['Normal routine — keep the area gently mobile.'],
+      green: ['Your normal routine is fine. Just keep the area gently moving.'],
       yellow: [
         'Targeted warmth on the sensitive area.',
         'Consider light support or bracing if you’ll be active.',

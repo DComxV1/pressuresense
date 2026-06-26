@@ -31,7 +31,7 @@ export const DEFAULT_CONFIG = {
   },
   wakingHours: { start: 7, end: 22 }, // hours considered for a day's rating
 
-  // Broader environmental load (A7) — optional, off by default. When enabled,
+  // Broader environmental load (A7). Optional, off by default. When enabled,
   // pressure weights are scaled down by the env total so the score stays in
   // [0,1], and temperature/humidity/temp-swing contribute the rest.
   env: {

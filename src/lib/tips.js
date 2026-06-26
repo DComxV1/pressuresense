@@ -29,19 +29,19 @@ export const BAND_META = {
 
 export const TIPS = {
   green: [
-    'Good day to be active — keep your normal routine.',
+    'A good day to be active. Keep your normal routine.',
     'A solid day to bank some movement: a longer walk pays off.',
     'Stay hydrated and keep the habits going.',
   ],
   yellow: [
     'Hydrate steadily through the day.',
-    'Keep moving in short bursts — don’t sit for long stretches.',
+    'Keep moving in short bursts, and try not to sit for too long.',
     'Wear compression socks if sitting or standing a while.',
     'Do gentle stretching, especially ankles and calves.',
     'Take a short walk after meals to keep circulation moving.',
   ],
   red: [
-    'Get ahead of inflammation early — don’t wait for the flare.',
+    'Get ahead of the inflammation early. Don’t wait for the flare to hit.',
     'Favor gentle movement over intense activity today.',
     'Elevate feet when resting to help ankle drainage.',
     'Apply warmth to stiff joints.',
@@ -79,7 +79,7 @@ export function buildBriefing(today, current) {
     parts.push(`${verb}${dropAt}.`)
   }
 
-  // Current direction context — only on tougher days, so a trivial dip never
+  // Current direction context, only on tougher days, so a trivial dip never
   // injects "start your measures" urgency into an otherwise good day (A9).
   if (current && today.band !== 'green') {
     if (current.trend === 'falling') {
@@ -89,17 +89,17 @@ export function buildBriefing(today, current) {
     }
   }
 
-  // Lead action — every briefing ends with something to *do*.
+  // Lead action. Every briefing ends with something to *do*.
   parts.push(leadAction(today.band))
 
   return { band: today.band, text: parts.join(' ') }
 }
 
 function leadAction(band) {
-  if (band === 'green') return 'Make the most of it — a good day to be active.'
+  if (band === 'green') return 'Make the most of it. It’s a good day to be active.'
   if (band === 'yellow')
-    return 'A few small habits keep you ahead of it: hydrate, keep moving in short bursts, and consider compression socks.'
-  return 'Plan a gentler day and get ahead of it early — anti-inflammatory measures, elevate your feet when resting, and extra hydration.'
+    return 'A few small habits will keep you ahead of it: drink plenty of water, keep moving in short bursts, and maybe pop on compression socks.'
+  return 'Plan a gentler day and get ahead of it early. Start your anti-inflammatory routine, put your feet up when you rest, and drink plenty of water.'
 }
 
 // Consecutive recent good days (felt good, else predicted green), counted from
@@ -115,10 +115,10 @@ export function goodStreak(history) {
 }
 
 // A short, warm note for good days and good streaks. Returns null on tougher
-// days — we never fake positivity; the briefing carries the agency there.
+// days; we never fake positivity, the briefing carries the agency there.
 export function buildEncouragement(today, streak) {
-  if (streak >= 3) return `${streak} good days in a row — pressure’s been kind. Nice run.`
-  if (today?.band === 'green') return 'A calm, steady day — a good one to move and feel good.'
+  if (streak >= 3) return `${streak} good days in a row. The weather’s been kind to you lately. Lovely run.`
+  if (today?.band === 'green') return 'A calm, steady day. A good one to move a little and feel good.'
   return null
 }
 
@@ -151,7 +151,7 @@ export function tipsFor(band, conditions = [], count = 5) {
   return out
 }
 
-// Plain-language "why this rating?" — explains the pressure reasoning so the
+// Plain-language "why this rating?" that explains the pressure reasoning so the
 // user learns their own pattern and trusts the forecast.
 export function buildExplanation(today, current, unit = 'inHg') {
   if (!today) return 'Not enough forecast data to explain the rating yet.'
@@ -164,12 +164,12 @@ export function buildExplanation(today, current, unit = 'inHg') {
     reasons.push(
       `Pressure falls about ${Math.abs(today.steepestRate).toFixed(1)} hPa over 6 hours${
         today.steepestRateHour ? ` around ${hourLabel(today.steepestRateHour)}` : ''
-      } — a falling trend is the strongest pain trigger, which is why this weighs heaviest.`,
+      }. A falling trend is the strongest pain trigger, so it counts for the most here.`,
     )
   } else if (today.steepestRate != null && today.steepestRate > 0.5) {
     reasons.push('Pressure is holding or rising through the day, which tends to bring relief.')
   } else {
-    reasons.push('Pressure stays fairly flat through the day — little movement to provoke a flare.')
+    reasons.push('Pressure stays fairly flat through the day, so there’s little movement to set off a flare.')
   }
 
   // Absolute level.
@@ -181,7 +181,7 @@ export function buildExplanation(today, current, unit = 'inHg') {
 
   // Current direction.
   if (current?.forward?.trend === 'dropping' && current.forward.startHour) {
-    reasons.push(`The drop begins after ${hourLabel(current.forward.startHour)} — act before then.`)
+    reasons.push(`The drop starts after ${hourLabel(current.forward.startHour)}, so it’s worth getting ahead of it before then.`)
   }
 
   // Secondary environmental driver (A7), when weather factors are enabled.

@@ -56,7 +56,7 @@ export default function CheckInCard({ entry, onChange }) {
               <label htmlFor="pain" className="text-sm text-slate-200">
                 Pain level
               </label>
-              <span className="text-sm tabular-nums text-slate-300">{pain == null ? '—' : `${pain}/10`}</span>
+              <span className="text-sm tabular-nums text-slate-300">{pain == null ? 'Not set' : `${pain}/10`}</span>
             </div>
             <input
               id="pain"

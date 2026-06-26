@@ -11,13 +11,13 @@ function trend3hLabel(delta, unit) {
   return `${sign}${v} over 3h`
 }
 
-// What's coming next — the heads-up the user actually wants.
+// What's coming next: the heads-up the user actually wants.
 function forwardLabel(forward) {
   if (!forward) return null
   if (forward.trend === 'dropping') {
     return forward.startHour ? `Dropping after ${hourLabel(forward.startHour)}` : 'Dropping ahead'
   }
-  if (forward.trend === 'rising') return 'Rising ahead — usually relief'
+  if (forward.trend === 'rising') return 'Rising ahead, usually a relief'
   return 'Holding steady ahead'
 }
 

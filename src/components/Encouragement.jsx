@@ -1,4 +1,4 @@
-// A9 — positive reinforcement. A slim, warm banner for good days and good
+// A9: positive reinforcement. A slim, warm banner for good days and good
 // streaks, so the app celebrates the wins rather than only flagging bad days.
 export default function Encouragement({ text }) {
   if (!text) return null

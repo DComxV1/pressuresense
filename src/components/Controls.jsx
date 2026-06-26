@@ -1,5 +1,5 @@
 // Sensitivity slider + unit toggle. Sensitivity calibrates when the model tips
-// into YELLOW/RED — everyone's pressure sensitivity is individual.
+// into YELLOW/RED. Everyone's pressure sensitivity is individual.
 export default function Controls({
   sensitivity,
   onSensitivity,

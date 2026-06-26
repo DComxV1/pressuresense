@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { rankedArticles } from '../lib/education.js'
 
-// A8 — short, condition-keyed explainers in an accordion. Articles relevant to
+// A8: short, condition-keyed explainers in an accordion. Articles relevant to
 // the user's conditions are surfaced first and flagged "For you".
 export default function EducationLibrary({ conditions }) {
   const [openId, setOpenId] = useState(null)

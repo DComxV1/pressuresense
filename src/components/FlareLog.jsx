@@ -1,4 +1,4 @@
-// A5 — Flare log. Mark a rough day and note what helped; over time this builds
+// A5: Flare log. Mark a rough day and note what helped; over time this builds
 // a personal "what works for me" list, ranked by how often each remedy helped.
 
 export const REMEDIES = [
@@ -68,7 +68,7 @@ export default function FlareLog({ history, todayKey, onMark, onUpdate, onToggle
           <textarea
             value={todayFlare.note || ''}
             onChange={(e) => onUpdate({ note: e.target.value })}
-            placeholder="Notes — what triggered it, what you tried, how it went…"
+            placeholder="What set it off, what you tried, how it went…"
             rows={2}
             className="w-full resize-none rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500"
           />

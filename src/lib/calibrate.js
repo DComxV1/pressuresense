@@ -1,5 +1,5 @@
 // Self-calibration (A4). After a couple of weeks of check-ins, find the
-// sensitivity whose band predictions best match how the user actually felt —
+// sensitivity whose band predictions best match how the user actually felt,
 // tuning the model to this person instead of the generic default.
 //
 // This works because each day's stored `score` is sensitivity-INDEPENDENT

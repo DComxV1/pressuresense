@@ -143,7 +143,7 @@ export default function App() {
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight text-slate-100">PressureSense</h1>
         <p className="text-sm text-slate-400">
-          Barometric pain forecast — what today will feel like, and what to do.
+          A gentle heads-up on how today might feel, and easy things that help.
         </p>
       </header>
 
@@ -239,10 +239,10 @@ export default function App() {
 function Disclaimer() {
   return (
     <p className="px-1 text-[11px] leading-relaxed text-slate-400">
-      The pressure–pain link is real for many people but individual, and this is general
-      wellness guidance, not medical advice or a diagnosis. Persistent or recurrent swelling
-      and pain — ankle swelling in particular — can have causes unrelated to weather and is
-      worth a check with a clinician.
+      The link between pressure and pain is real for a lot of people, but it’s individual, and
+      this is general wellness guidance, not medical advice or a diagnosis. Swelling and pain
+      that stick around or keep coming back, especially in the ankles, can have causes that
+      have nothing to do with the weather, so they’re always worth a chat with a doctor.
     </p>
   )
 }
