@@ -26,6 +26,7 @@ npm run preview  # serve the production build
 - **Hourly chart** for the selected day: dots colored by hourly risk (with a text legend), a shaded **comfort-zone** band, and the **peak-risk hour** marked on the curve.
 - **Sensitivity slider** — calibrates when the model tips into YELLOW/RED (pressure sensitivity is individual).
 - **Self-calibration** — after ~2 weeks of check-ins, suggests the sensitivity that best fits *your own* logged days (replaying each day's sensitivity-independent score against how you felt) and applies it in one tap. This is the core differentiator vs. generic barometer apps.
+- **Weather factors (optional)** — a toggle to also weigh cold, humidity, and rapid temperature swings, not just pressure. Off by default (so the validated pressure-only score is unchanged); when on, pressure weights scale down so the combined score stays in range, and the briefing notes a secondary driver (e.g. "a sharp temperature swing is adding to the risk").
 - **Condition selector** — pick conditions (osteoarthritis, rheumatoid/inflammatory, fibromyalgia, gout, old injury); the tip engine swaps in mechanism-specific coaching for each.
 - **Daily check-in** — a quick Good / So-so / Painful, with optional detail: a 1–10 pain level plus joint-location and symptom tags (swelling, stiffness, fatigue, brain fog…).
 - **Flare log** — mark a rough day and tag what helped; over time it builds a ranked, personal "what works for me" list and a history of past flares with notes.

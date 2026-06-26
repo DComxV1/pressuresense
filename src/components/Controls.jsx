@@ -1,6 +1,13 @@
 // Sensitivity slider + unit toggle. Sensitivity calibrates when the model tips
 // into YELLOW/RED — everyone's pressure sensitivity is individual.
-export default function Controls({ sensitivity, onSensitivity, unit, onUnit }) {
+export default function Controls({
+  sensitivity,
+  onSensitivity,
+  unit,
+  onUnit,
+  includeWeather,
+  onIncludeWeather,
+}) {
   return (
     <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
       <div className="flex items-center justify-between">
@@ -42,6 +49,30 @@ export default function Controls({ sensitivity, onSensitivity, unit, onUnit }) {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-medium text-slate-200">Weather factors</div>
+          <p className="text-xs text-slate-400">
+            Also weigh cold, humidity &amp; temperature swings, not just pressure.
+          </p>
+        </div>
+        <button
+          role="switch"
+          aria-checked={includeWeather}
+          aria-label="Include temperature and humidity in the risk score"
+          onClick={() => onIncludeWeather(!includeWeather)}
+          className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+            includeWeather ? 'bg-sky-600' : 'bg-slate-600'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${
+              includeWeather ? 'left-[22px]' : 'left-0.5'
+            }`}
+          />
+        </button>
       </div>
     </div>
   )

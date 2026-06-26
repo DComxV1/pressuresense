@@ -157,5 +157,13 @@ export function buildExplanation(today, current, unit = 'inHg') {
     reasons.push(`The drop begins after ${hourLabel(current.forward.startHour)} — act before then.`)
   }
 
+  // Secondary environmental driver (A7), when weather factors are enabled.
+  const envNote = {
+    cold: 'Cold temperatures are adding to the stiffness risk today.',
+    humidity: 'High humidity may be adding to it.',
+    tempSwing: 'A sharp temperature swing is adding to the risk.',
+  }[today.envDriver]
+  if (envNote) reasons.push(envNote)
+
   return reasons.join(' ')
 }

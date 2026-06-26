@@ -53,7 +53,7 @@ export async function fetchPressureSeries(lat, lon) {
   const params = new URLSearchParams({
     latitude: String(lat),
     longitude: String(lon),
-    hourly: 'pressure_msl,surface_pressure,temperature_2m',
+    hourly: 'pressure_msl,surface_pressure,temperature_2m,relative_humidity_2m',
     forecast_days: '4',
     past_days: '1',
     timezone: 'auto',
@@ -65,6 +65,7 @@ export async function fetchPressureSeries(lat, lon) {
   const times = data.hourly?.time || []
   const msl = data.hourly?.pressure_msl || []
   const temps = data.hourly?.temperature_2m || []
+  const humidity = data.hourly?.relative_humidity_2m || []
 
   const hourly = times
     .map((t, i) => ({
@@ -72,6 +73,7 @@ export async function fetchPressureSeries(lat, lon) {
       time: new Date(t),
       hPa: msl[i],
       tempC: temps[i],
+      rh: humidity[i],
     }))
     .filter((p) => typeof p.hPa === 'number' && !Number.isNaN(p.hPa))
 

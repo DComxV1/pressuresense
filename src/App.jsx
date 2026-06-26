@@ -38,7 +38,7 @@ export default function App() {
   const [history, setHistory] = useState(loadHistory)
   const [selectedKey, setSelectedKey] = useState(null)
 
-  const { unit, sensitivity, location, conditions, onboarded } = settings
+  const { unit, sensitivity, location, conditions, onboarded, includeWeather } = settings
   const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
   const showOnboarding = !onboarded && (conditions || []).length === 0
 
@@ -74,14 +74,14 @@ export default function App() {
   const model = useMemo(() => {
     if (!series?.hourly?.length) return null
     const now = new Date()
-    const scored = computeHourlyRisk(series.hourly, sensitivity)
+    const scored = computeHourlyRisk(series.hourly, sensitivity, undefined, includeWeather)
     const current = currentConditions(scored, now)
     const days = dailyForecast(scored, now, 3)
     const today = days[0] || null
     const briefing = buildBriefing(today, current)
     const explanation = buildExplanation(today, current, unit)
     return { scored, current, days, today, briefing, explanation }
-  }, [series, sensitivity, unit])
+  }, [series, sensitivity, unit, includeWeather])
 
   // Log today's prediction once we have a model.
   useEffect(() => {
@@ -208,6 +208,8 @@ export default function App() {
           onSensitivity={(v) => update({ sensitivity: v })}
           unit={unit}
           onUnit={(u) => update({ unit: u })}
+          includeWeather={!!includeWeather}
+          onIncludeWeather={(v) => update({ includeWeather: v })}
         />
 
         {!showOnboarding && (

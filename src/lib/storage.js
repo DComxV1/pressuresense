@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS = {
   sensitivity: 50, // 0-100
   conditions: [], // selected condition keys (A1); [] => onboarding prompt
   onboarded: false, // dismissed the condition prompt at least once
+  includeWeather: false, // fold temperature/humidity/temp-swing into the score (A7)
   // Seeded so the dashboard populates on first run; change via "Use my location"
   // or city search.
   location: { label: 'Nags Head, NC', latitude: 35.957, longitude: -75.624 },

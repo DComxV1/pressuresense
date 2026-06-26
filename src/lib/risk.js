@@ -30,6 +30,16 @@ export const DEFAULT_CONFIG = {
     red: 0.6,
   },
   wakingHours: { start: 7, end: 22 }, // hours considered for a day's rating
+
+  // Broader environmental load (A7) — optional, off by default. When enabled,
+  // pressure weights are scaled down by the env total so the score stays in
+  // [0,1], and temperature/humidity/temp-swing contribute the rest.
+  env: {
+    weights: { cold: 0.1, humidity: 0.07, tempSwing: 0.13 }, // total 0.30
+    cold: { warmAbove: 15, coldAt: 0 }, // °C: >=warm -> 0, <=coldAt -> 1
+    humidity: { lowAt: 60, highAt: 95 }, // % RH
+    tempSwing: { coolStart: -2, coolSevere: -8, warmStart: 4, warmSevere: 12 }, // °C/6h
+  },
 }
 
 const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x))
@@ -46,6 +56,39 @@ export function rateFactor(rateHpaPer6h, cfg = DEFAULT_CONFIG) {
   if (rateHpaPer6h >= meaningfulDrop) return 0 // rising, flat, or only drifting
   if (rateHpaPer6h <= severeDrop) return 1
   return (meaningfulDrop - rateHpaPer6h) / (meaningfulDrop - severeDrop)
+}
+
+// Environmental factors (A7). Each returns 0 (benign) .. 1 (aggravating).
+export function coldFactor(tempC, cfg = DEFAULT_CONFIG) {
+  if (tempC == null) return 0
+  const { warmAbove, coldAt } = cfg.env.cold
+  if (tempC >= warmAbove) return 0
+  if (tempC <= coldAt) return 1
+  return (warmAbove - tempC) / (warmAbove - coldAt)
+}
+
+export function humidityFactor(rh, cfg = DEFAULT_CONFIG) {
+  if (rh == null) return 0
+  const { lowAt, highAt } = cfg.env.humidity
+  if (rh <= lowAt) return 0
+  if (rh >= highAt) return 1
+  return (rh - lowAt) / (highAt - lowAt)
+}
+
+// Rapid temperature swing over 6h. A cold snap (cooling) is the classic
+// trigger; rapid warming contributes mildly.
+export function tempSwingFactor(rate6h, cfg = DEFAULT_CONFIG) {
+  if (rate6h == null) return 0
+  const { coolStart, coolSevere, warmStart, warmSevere } = cfg.env.tempSwing
+  if (rate6h <= coolStart) {
+    if (rate6h <= coolSevere) return 1
+    return (coolStart - rate6h) / (coolStart - coolSevere)
+  }
+  if (rate6h >= warmStart) {
+    if (rate6h >= warmSevere) return 0.5
+    return ((rate6h - warmStart) / (warmSevere - warmStart)) * 0.5
+  }
+  return 0
 }
 
 // Sensitivity 0-100 -> multiplier on cutoffs. 50 is neutral (x1).
@@ -66,28 +109,60 @@ export function scoreToBand(score, sensitivity = 50, cfg = DEFAULT_CONFIG) {
 }
 
 // Trailing 6h rate for index i. Hourly samples are 1h apart.
-function rate6hAt(hourly, i) {
+function rate6hAt(hourly, i, field = 'hPa') {
   const j = i - 6
   if (j < 0) return null
-  return hourly[i].hPa - hourly[j].hPa
+  const a = hourly[i][field]
+  const b = hourly[j][field]
+  if (a == null || b == null) return null
+  return a - b
 }
 
-// Annotate every hourly sample with its risk components.
-export function computeHourlyRisk(hourly, sensitivity = 50, cfg = DEFAULT_CONFIG) {
+// Annotate every hourly sample with its risk components. When includeEnv is
+// true, temperature/humidity/temp-swing are folded in (A7); pressure weights
+// are scaled down by the env total so the combined score stays in [0,1].
+export function computeHourlyRisk(hourly, sensitivity = 50, cfg = DEFAULT_CONFIG, includeEnv = false) {
+  const ew = cfg.env.weights
+  const envTotal = ew.cold + ew.humidity + ew.tempSwing
+  const pScale = includeEnv ? 1 - envTotal : 1
+
   return hourly.map((p, i) => {
     const rate6h = rate6hAt(hourly, i)
     const absF = absoluteFactor(p.hPa, cfg)
     const rateF = rate6h == null ? 0 : rateFactor(rate6h, cfg)
-    const score = clamp(cfg.weights.absolute * absF + cfg.weights.rate * rateF)
+    let score = pScale * (cfg.weights.absolute * absF + cfg.weights.rate * rateF)
+
+    let env = null
+    if (includeEnv) {
+      const tempRate6h = rate6hAt(hourly, i, 'tempC')
+      const coldF = coldFactor(p.tempC, cfg)
+      const humF = humidityFactor(p.rh, cfg)
+      const swingF = tempSwingFactor(tempRate6h, cfg)
+      score += ew.cold * coldF + ew.humidity * humF + ew.tempSwing * swingF
+      env = { coldF, humF, swingF, tempRate6h, driver: dominantEnvDriver(coldF, humF, swingF) }
+    }
+
+    score = clamp(score)
     return {
       ...p,
       rate6h,
       absFactor: absF,
       rateFactor: rateF,
+      env,
       score,
       band: scoreToBand(score, sensitivity, cfg),
     }
   })
+}
+
+// The most aggravating env factor for this hour, if any is notable (>0.5).
+function dominantEnvDriver(coldF, humF, swingF) {
+  const ranked = [
+    ['tempSwing', swingF],
+    ['cold', coldF],
+    ['humidity', humF],
+  ].sort((a, b) => b[1] - a[1])
+  return ranked[0][1] > 0.5 ? ranked[0][0] : null
 }
 
 const BAND_RANK = { green: 0, yellow: 1, red: 2 }
@@ -163,6 +238,7 @@ export function dailyForecast(scored, now = new Date(), days = 3, cfg = DEFAULT_
       date: new Date(key),
       band: worst.band,
       score: worst.score,
+      envDriver: worst.env?.driver || null,
       peakHour: worst.time,
       minPressure: minPressure.hPa,
       minPressureHour: minPressure.time,
