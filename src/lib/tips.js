@@ -59,30 +59,37 @@ export function buildBriefing(today, current) {
       text: 'Not enough forecast data yet for a full briefing.',
     }
   }
-  const meta = BAND_META[today.band]
-  const parts = [`Today looks like a ${meta.label} day.`]
+  // Tone discipline (A9): describe the day in plain, non-dread language and
+  // always pair any warning with agency. The GREEN/YELLOW/RED label still shows
+  // in the card header for at-a-glance clarity; the narrative stays gentle.
+  const descriptor = { green: 'a good day', yellow: 'a moderate day', red: 'a tougher day' }[
+    today.band
+  ]
+  const parts = [`Today looks like ${descriptor}.`]
 
   // Describe the pressure movement.
   if (today.band === 'green') {
-    parts.push('Pressure stays in the comfortable, stable zone.')
+    parts.push('Pressure stays comfortable and steady.')
   } else {
-    const dropAt = today.steepestRate != null && today.steepestRate < -1.5
-      ? ` around ${hourLabel(today.steepestRateHour)}`
-      : ''
-    const verb = today.band === 'red' ? 'a rapid drop' : 'pressure dropping'
-    parts.push(`Expect ${verb}${dropAt}.`)
+    const dropAt =
+      today.steepestRate != null && today.steepestRate < -1.5
+        ? ` around ${hourLabel(today.steepestRateHour)}`
+        : ''
+    const verb = today.band === 'red' ? 'A sharp pressure drop is coming' : 'Pressure eases down'
+    parts.push(`${verb}${dropAt}.`)
   }
 
-  // Current direction context.
-  if (current) {
+  // Current direction context — only on tougher days, so a trivial dip never
+  // injects "start your measures" urgency into an otherwise good day (A9).
+  if (current && today.band !== 'green') {
     if (current.trend === 'falling') {
-      parts.push('Pressure is already falling right now — start your measures now.')
+      parts.push('It’s already easing now, so start your measures early.')
     } else if (current.trend === 'rising') {
-      parts.push('Pressure is rising at the moment, which usually brings relief.')
+      parts.push('Pressure is rising now, which usually brings relief.')
     }
   }
 
-  // Lead action.
+  // Lead action — every briefing ends with something to *do*.
   parts.push(leadAction(today.band))
 
   return { band: today.band, text: parts.join(' ') }
@@ -91,8 +98,28 @@ export function buildBriefing(today, current) {
 function leadAction(band) {
   if (band === 'green') return 'Make the most of it — a good day to be active.'
   if (band === 'yellow')
-    return 'Hydrate, keep moving in short bursts, and consider compression socks.'
-  return 'Start anti-inflammatory measures early, elevate feet when resting, and plan a lighter day.'
+    return 'A few small habits keep you ahead of it: hydrate, keep moving in short bursts, and consider compression socks.'
+  return 'Plan a gentler day and get ahead of it early — anti-inflammatory measures, elevate your feet when resting, and extra hydration.'
+}
+
+// Consecutive recent good days (felt good, else predicted green), counted from
+// the most recent entry back. Used for positive reinforcement (A9).
+export function goodStreak(history) {
+  let n = 0
+  for (const h of history) {
+    const good = h.felt ? h.felt === 'good' : h.predictedBand === 'green'
+    if (good) n++
+    else break
+  }
+  return n
+}
+
+// A short, warm note for good days and good streaks. Returns null on tougher
+// days — we never fake positivity; the briefing carries the agency there.
+export function buildEncouragement(today, streak) {
+  if (streak >= 3) return `${streak} good days in a row — pressure’s been kind. Nice run.`
+  if (today?.band === 'green') return 'A calm, steady day — a good one to move and feel good.'
+  return null
 }
 
 // Pick a deterministic-ish rotating subset so the card isn't overwhelming.

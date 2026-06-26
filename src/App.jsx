@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchPressureSeries, reverseGeocode } from './lib/weather.js'
 import { computeHourlyRisk, currentConditions, dailyForecast } from './lib/risk.js'
-import { buildBriefing, tipsFor, buildExplanation } from './lib/tips.js'
+import { buildBriefing, tipsFor, buildExplanation, goodStreak, buildEncouragement } from './lib/tips.js'
 import { CONDITION_MAP } from './lib/conditions.js'
 import { suggestSensitivity } from './lib/calibrate.js'
 import {
@@ -29,6 +29,7 @@ import FlareLog from './components/FlareLog.jsx'
 import EducationLibrary from './components/EducationLibrary.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
+import Encouragement from './components/Encouragement.jsx'
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -96,6 +97,8 @@ export default function App() {
     () => suggestSensitivity(history, sensitivity),
     [history, sensitivity],
   )
+
+  const encouragement = model ? buildEncouragement(model.today, goodStreak(history)) : null
 
   const update = (patch) => setSettings((s) => ({ ...s, ...patch }))
 
@@ -175,6 +178,7 @@ export default function App() {
 
         {status === 'ready' && model && (
           <>
+            <Encouragement text={encouragement} />
             <BriefingCard
               briefing={model.briefing}
               tips={tipsFor(model.today?.band || 'green', selectedConditions)}
