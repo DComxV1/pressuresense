@@ -1,0 +1,84 @@
+# PressureSense — Barometric Pressure Pain Forecast
+
+A personal webapp that forecasts joint-pain risk from barometric pressure trends and
+delivers a daily *"how today will feel + what to do about it"* briefing.
+
+This is the **Phase 1 webapp** from [`pressure-pain-app-spec.md`](./pressure-pain-app-spec.md) —
+built to nail the core logic before an eventual iOS port.
+
+## Run it
+
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
+
+```bash
+npm run build    # production build into dist/
+npm run preview  # serve the production build
+```
+
+## What it does
+
+- **Today's briefing** — plain-language summary of the day's risk band + the top mitigation tips.
+- **Current pressure** with a rising/falling/steady trend arrow and an inHg ⇄ hPa toggle.
+- **3-day forecast strip** — each day rated GREEN / YELLOW / RED, with the day's pressure low and the time of the steepest drop.
+- **Hourly chart** for the selected day, dots colored by hourly risk.
+- **Sensitivity slider** — calibrates when the model tips into YELLOW/RED (pressure sensitivity is individual).
+- **History log** — records each day's prediction so you can mark how you *actually* felt and validate the model over time.
+
+## How the risk model works
+
+> Key principle from the brief: **rate of change matters more than the absolute reading.**
+> A rapid drop provokes pain more than a steady low.
+
+For each hour, two factors are combined:
+
+```
+risk_score = 0.35 * absolute_pressure_factor + 0.65 * rate_of_change_factor
+```
+
+- **Absolute factor** — 0 in the comfortable zone (≥ 1013 hPa / 29.92 inHg), ramping to 1 at ~996 hPa.
+- **Rate factor** — 0 when pressure is rising/stable, ramping to 1 at a fall of ~8 hPa over 6 hours. A drop beginning at ~2 hPa/6h is where risk starts.
+- Rate is weighted ~2× the absolute factor. Rising pressure after a low scores as relief.
+
+Score maps to a 3-band rating; the **sensitivity slider** shifts the band cutoffs per user.
+
+All thresholds and weights live in `DEFAULT_CONFIG` in
+[`src/lib/risk.js`](./src/lib/risk.js) — tune them against real days.
+
+## Data source
+
+Pressure comes from [Open-Meteo](https://open-meteo.com/) (`pressure_msl`, hourly, in hPa) —
+**free, no API key required**. All provider code is isolated in
+[`src/lib/weather.js`](./src/lib/weather.js); swap that one file to move to OpenWeather,
+Tomorrow.io, or Apple WeatherKit (recommended for the iOS port) without touching the rest.
+
+The spec named OpenWeather One Call, but that now requires an account + card on file even
+for the free tier — Open-Meteo removes that friction for the prototype.
+
+## Project structure
+
+```
+src/
+  lib/
+    weather.js   # provider layer (Open-Meteo) — the only file that fetches
+    risk.js      # scoring engine + DEFAULT_CONFIG (the tunable core)
+    tips.js      # mitigation tip engine + briefing generator
+    storage.js   # localStorage settings + history log
+    format.js    # hPa/inHg conversion + display helpers
+  components/     # CurrentCard, BriefingCard, ForecastStrip, HourlyChart, Controls, LocationBar, HistoryView
+  App.jsx         # wiring
+```
+
+## Not medical advice
+
+The pressure–pain link is real for many people but individual. This app gives general
+wellness guidance, not a diagnosis. Persistent or recurrent swelling and pain — ankle
+swelling in particular — can have causes unrelated to weather and is worth a clinician's check.
+
+## Next (Phase 2 — iOS)
+
+WeatherKit for forecast pressure, CoreMotion (`CMAltimeter`) for the live device barometer,
+and push notifications for the "heads-up before the drop" alert and morning briefing.
+The risk model in `risk.js` ports directly.
