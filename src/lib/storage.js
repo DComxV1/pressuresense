@@ -41,15 +41,17 @@ export function loadHistory() {
   }
 }
 
-// Upsert today's predicted band; keep the user's self-reported "felt" rating.
-export function recordPrediction(dateKey, band, score) {
+// Upsert today's prediction. minPressure (hPa) is stored so the correlation
+// view (A3) can plot actual pressure against logged symptoms over time.
+export function recordPrediction(dateKey, band, score, minPressure = null) {
   const history = loadHistory()
   const existing = history.find((h) => h.dateKey === dateKey)
   if (existing) {
     existing.predictedBand = band
     existing.score = score
+    if (minPressure != null) existing.minPressure = minPressure
   } else {
-    history.unshift({ dateKey, predictedBand: band, score, felt: null })
+    history.unshift({ dateKey, predictedBand: band, score, minPressure, felt: null })
   }
   const trimmed = history.slice(0, 60)
   try {

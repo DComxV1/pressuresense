@@ -18,7 +18,7 @@ import HourlyChart from './components/HourlyChart.jsx'
 import Controls from './components/Controls.jsx'
 import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
-import CorrelationStrip from './components/CorrelationStrip.jsx'
+import CorrelationView from './components/CorrelationView.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
 
@@ -79,7 +79,9 @@ export default function App() {
   // Log today's prediction once we have a model.
   useEffect(() => {
     if (!model?.today) return
-    setHistory(recordPrediction(model.today.key, model.today.band, model.today.score))
+    setHistory(
+      recordPrediction(model.today.key, model.today.band, model.today.score, model.today.minPressure),
+    )
   }, [model?.today?.key, model?.today?.band])
 
   const update = (patch) => setSettings((s) => ({ ...s, ...patch }))
@@ -189,7 +191,7 @@ export default function App() {
           <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
         )}
 
-        <CorrelationStrip history={history} />
+        <CorrelationView history={history} unit={unit} />
 
         <HistoryView
           history={history}
