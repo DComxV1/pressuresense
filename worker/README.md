@@ -14,8 +14,9 @@ web-push alerts. Web push is implemented with the Web Crypto API (RFC 8291
 
 ## Schedule
 Crons `0 11 * * *` and `0 23 * * *` (UTC ≈ morning/evening ET). Each run computes
-the relevant day's risk band per subscriber and sends one alert per tough day
-(deduped via `lastNotified`). Expired subscriptions (404/410) are pruned.
+the relevant day's risk band per subscriber and sends a daily briefing for every
+band — good, moderate, or tough — with band-appropriate guidance (deduped to one
+per day via `lastNotified`). Expired subscriptions (404/410) are pruned.
 
 ## Config / secrets
 - `wrangler.toml`: KV binding `SUBS`, `VAPID_PUBLIC`, `VAPID_SUBJECT`, `APP_URL`.

@@ -159,12 +159,18 @@ function buildMessage(band, isToday) {
   if (band === 'red') {
     return {
       title: `${when} looks like a tougher day`,
-      body: `A sharp pressure drop is coming. Plan a gentler ${isToday ? 'day' : 'one'} and get ahead of it early.`,
+      body: `A sharp pressure drop is coming. Plan a gentler ${isToday ? 'day' : 'one'} and get ahead of it early with your anti-inflammatory routine, feet up when you rest, and plenty of water.`,
+    }
+  }
+  if (band === 'yellow') {
+    return {
+      title: `${when} looks like a moderate day`,
+      body: `Some pressure movement ahead. Stay ahead of it: keep hydrated, move in short bursts, and maybe pop on compression socks.`,
     }
   }
   return {
-    title: `${when} looks like a moderate day`,
-    body: `Some pressure movement ahead. A few small habits will keep you ahead of it.`,
+    title: `${when} looks like a good day`,
+    body: `Pressure stays calm and steady. A good day to be active and keep your routine. Stay hydrated and bank some gentle movement while it's easy.`,
   }
 }
 
@@ -236,8 +242,7 @@ export default {
       if (!sub.location) continue
       try {
         const f = await forecastForDay(sub.location, sub.sensitivity, slot)
-        if (f.band === 'green') continue
-        if (sub.lastNotified === f.targetDate) continue // one alert per tough day
+        if (sub.lastNotified === f.targetDate) continue // one briefing per day
         const m = buildMessage(f.band, f.isToday)
         const status = await sendPush(
           sub.subscription,
