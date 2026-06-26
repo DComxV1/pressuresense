@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchPressureSeries, reverseGeocode } from './lib/weather.js'
 import { computeHourlyRisk, currentConditions, dailyForecast } from './lib/risk.js'
-import { buildBriefing, tipsForBand, buildExplanation } from './lib/tips.js'
+import { buildBriefing, tipsFor, buildExplanation } from './lib/tips.js'
+import { CONDITION_MAP } from './lib/conditions.js'
 import {
   loadSettings,
   saveSettings,
   loadHistory,
   recordPrediction,
-  recordFelt,
+  recordCheckIn,
 } from './lib/storage.js'
 
 import CurrentCard from './components/CurrentCard.jsx'
@@ -18,6 +19,8 @@ import Controls from './components/Controls.jsx'
 import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
 import CorrelationStrip from './components/CorrelationStrip.jsx'
+import ConditionSelector from './components/ConditionSelector.jsx'
+import CheckInCard from './components/CheckInCard.jsx'
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -28,7 +31,9 @@ export default function App() {
   const [history, setHistory] = useState(loadHistory)
   const [selectedKey, setSelectedKey] = useState(null)
 
-  const { unit, sensitivity, location } = settings
+  const { unit, sensitivity, location, conditions, onboarded } = settings
+  const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
+  const showOnboarding = !onboarded && (conditions || []).length === 0
 
   // Persist settings whenever they change.
   useEffect(() => saveSettings(settings), [settings])
@@ -79,6 +84,18 @@ export default function App() {
 
   const update = (patch) => setSettings((s) => ({ ...s, ...patch }))
 
+  function toggleCondition(key) {
+    setSettings((s) => {
+      const set = new Set(s.conditions || [])
+      set.has(key) ? set.delete(key) : set.add(key)
+      return { ...s, conditions: [...set], onboarded: true }
+    })
+  }
+
+  const todayKey = model?.today?.key || new Date().toDateString()
+  const todayEntry = history.find((h) => h.dateKey === todayKey) || null
+  const onCheckIn = (patch) => setHistory(recordCheckIn(todayKey, patch))
+
   function useDeviceLocation() {
     if (!navigator.geolocation) {
       setError('Geolocation is not available in this browser.')
@@ -120,6 +137,15 @@ export default function App() {
           locating={locating}
         />
 
+        {showOnboarding && (
+          <ConditionSelector
+            selected={conditions || []}
+            onToggle={toggleCondition}
+            onboarding
+            onDismiss={() => update({ onboarded: true })}
+          />
+        )}
+
         {status === 'loading' && (
           <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-8 text-center text-sm text-slate-400">
             Loading pressure data…
@@ -136,7 +162,7 @@ export default function App() {
           <>
             <BriefingCard
               briefing={model.briefing}
-              tips={tipsForBand(model.today?.band || 'green')}
+              tips={tipsFor(model.today?.band || 'green', selectedConditions)}
               explanation={model.explanation}
             />
             <CurrentCard current={model.current} unit={unit} />
@@ -150,6 +176,8 @@ export default function App() {
           </>
         )}
 
+        {status === 'ready' && <CheckInCard entry={todayEntry} onChange={onCheckIn} />}
+
         <Controls
           sensitivity={sensitivity}
           onSensitivity={(v) => update({ sensitivity: v })}
@@ -157,11 +185,15 @@ export default function App() {
           onUnit={(u) => update({ unit: u })}
         />
 
+        {!showOnboarding && (
+          <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
+        )}
+
         <CorrelationStrip history={history} />
 
         <HistoryView
           history={history}
-          onFelt={(dateKey, felt) => setHistory(recordFelt(dateKey, felt))}
+          onFelt={(dateKey, felt) => setHistory(recordCheckIn(dateKey, { felt }))}
         />
 
         <Disclaimer />

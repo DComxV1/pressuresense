@@ -101,6 +101,29 @@ export function tipsForBand(band, count = 4) {
   return all.slice(0, count)
 }
 
+// Condition-aware tips (A1). When the user has picked conditions, lead with one
+// general tip then prioritize the mechanism-specific coaching for those
+// conditions; otherwise fall back to the generic band tips.
+export function tipsFor(band, conditions = [], count = 5) {
+  if (!conditions?.length) return tipsForBand(band, count)
+  const out = [(TIPS[band] || TIPS.green)[0]] // one general lead tip
+  // Round-robin across conditions so multiple selections each get a voice.
+  const lists = conditions.map((c) => (c.tips?.[band] || []).slice())
+  let added = true
+  while (out.length < count && added) {
+    added = false
+    for (const list of lists) {
+      if (list.length) {
+        const tip = list.shift()
+        if (!out.includes(tip)) out.push(tip)
+        added = true
+        if (out.length >= count) break
+      }
+    }
+  }
+  return out
+}
+
 // Plain-language "why this rating?" — explains the pressure reasoning so the
 // user learns their own pattern and trusts the forecast.
 export function buildExplanation(today, current, unit = 'inHg') {

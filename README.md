@@ -25,6 +25,8 @@ npm run preview  # serve the production build
 - **3-day forecast strip** — each day rated GREEN / YELLOW / RED, with a mini sparkline and the day's pressure **swing** (the change matters more than the floor).
 - **Hourly chart** for the selected day: dots colored by hourly risk (with a text legend), a shaded **comfort-zone** band, and the **peak-risk hour** marked on the curve.
 - **Sensitivity slider** — calibrates when the model tips into YELLOW/RED (pressure sensitivity is individual).
+- **Condition selector** — pick conditions (osteoarthritis, rheumatoid/inflammatory, fibromyalgia, gout, old injury); the tip engine swaps in mechanism-specific coaching for each.
+- **Daily check-in** — a quick Good / So-so / Painful, with optional detail: a 1–10 pain level plus joint-location and symptom tags (swelling, stiffness, fatigue, brain fog…).
 - **7-day correlation strip + history log** — records each day's prediction so you can mark how you *actually* felt; the strip shows predicted-vs-felt side by side to validate the model over time.
 - **Location** — city search or device geolocation (reverse-geocoded to a place name).
 

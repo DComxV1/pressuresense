@@ -7,6 +7,8 @@ const HISTORY_KEY = 'pressuresense.history'
 export const DEFAULT_SETTINGS = {
   unit: 'inHg', // 'inHg' | 'hPa'
   sensitivity: 50, // 0-100
+  conditions: [], // selected condition keys (A1); [] => onboarding prompt
+  onboarded: false, // dismissed the condition prompt at least once
   // Seeded so the dashboard populates on first run; change via "Use my location"
   // or city search.
   location: { label: 'Nags Head, NC', latitude: 35.957, longitude: -75.624 },
@@ -59,13 +61,23 @@ export function recordPrediction(dateKey, band, score) {
 }
 
 export function recordFelt(dateKey, felt) {
+  return recordCheckIn(dateKey, { felt })
+}
+
+// Merge a check-in patch (felt, pain 1-10, joints[], symptoms[]) into a day.
+// Creates the entry if today wasn't predicted yet. (A2)
+export function recordCheckIn(dateKey, patch) {
   const history = loadHistory()
-  const existing = history.find((h) => h.dateKey === dateKey)
-  if (existing) existing.felt = felt
+  let existing = history.find((h) => h.dateKey === dateKey)
+  if (!existing) {
+    existing = { dateKey, predictedBand: null, score: null, felt: null }
+    history.unshift(existing)
+  }
+  Object.assign(existing, patch)
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history))
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 60)))
   } catch {
     /* ignore */
   }
-  return history
+  return loadHistory()
 }

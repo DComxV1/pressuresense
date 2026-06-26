@@ -33,8 +33,17 @@ export default function HistoryView({ history, onFelt }) {
             >
               <div className="flex items-center gap-2">
                 <span className={`h-2.5 w-2.5 rounded-full ${c.dot}`} />
-                <span className="text-sm text-slate-200">{formatDate(h.dateKey)}</span>
-                <span className={`text-xs ${c.text}`}>{BAND_META[h.predictedBand]?.label}</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-200">{formatDate(h.dateKey)}</span>
+                    {h.predictedBand && (
+                      <span className={`text-xs ${c.text}`}>{BAND_META[h.predictedBand]?.label}</span>
+                    )}
+                  </div>
+                  {detailSummary(h) && (
+                    <div className="text-[11px] text-slate-400">{detailSummary(h)}</div>
+                  )}
+                </div>
               </div>
               <div className="inline-flex overflow-hidden rounded-md border border-slate-600">
                 {FELT.map((f) => (
@@ -57,6 +66,14 @@ export default function HistoryView({ history, onFelt }) {
       </ul>
     </div>
   )
+}
+
+function detailSummary(h) {
+  const bits = []
+  if (h.pain != null) bits.push(`pain ${h.pain}/10`)
+  const tags = [...(h.joints || []), ...(h.symptoms || [])]
+  if (tags.length) bits.push(tags.slice(0, 3).join(', ') + (tags.length > 3 ? '…' : ''))
+  return bits.join(' · ')
 }
 
 function formatDate(key) {
