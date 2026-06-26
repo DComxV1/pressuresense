@@ -206,7 +206,17 @@ export default function App() {
           </>
         )}
 
+        {/* Track & review — the daily habit and the payoff */}
         {status === 'ready' && <CheckInCard entry={todayEntry} onChange={onCheckIn} />}
+
+        <CorrelationView history={history} unit={unit} />
+
+        <HistoryView
+          history={history}
+          onFelt={(dateKey, felt) => setHistory(recordCheckIn(dateKey, { felt }))}
+        />
+
+        <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
         <FlareLog
           history={history}
@@ -217,7 +227,18 @@ export default function App() {
           onUnmark={() => setHistory(unmarkFlare(todayKey))}
         />
 
-        <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
+        {/* Setup & reference — set-once or occasional */}
+        <NotificationsCard
+          location={location}
+          sensitivity={sensitivity}
+          morningHour={morningHour ?? 7}
+          eveningHour={eveningHour ?? 19}
+          onHours={(patch) => update(patch)}
+        />
+
+        {!showOnboarding && (
+          <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
+        )}
 
         <Controls
           sensitivity={sensitivity}
@@ -232,26 +253,7 @@ export default function App() {
           onTextSize={(t) => update({ textSize: t })}
         />
 
-        {!showOnboarding && (
-          <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
-        )}
-
-        <NotificationsCard
-          location={location}
-          sensitivity={sensitivity}
-          morningHour={morningHour ?? 7}
-          eveningHour={eveningHour ?? 19}
-          onHours={(patch) => update(patch)}
-        />
-
         <EducationLibrary conditions={conditions || []} />
-
-        <CorrelationView history={history} unit={unit} />
-
-        <HistoryView
-          history={history}
-          onFelt={(dateKey, felt) => setHistory(recordCheckIn(dateKey, { felt }))}
-        />
 
         <Disclaimer />
       </div>
