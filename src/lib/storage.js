@@ -76,10 +76,59 @@ export function recordCheckIn(dateKey, patch) {
     history.unshift(existing)
   }
   Object.assign(existing, patch)
+  return saveHistory(history)
+}
+
+function saveHistory(history) {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 60)))
   } catch {
     /* ignore */
   }
   return loadHistory()
+}
+
+function ensureEntry(history, dateKey) {
+  let existing = history.find((h) => h.dateKey === dateKey)
+  if (!existing) {
+    existing = { dateKey, predictedBand: null, score: null, felt: null }
+    history.unshift(existing)
+  }
+  return existing
+}
+
+// Flare log (A5). Mark a rough day; optionally record what helped. The flare
+// lives on the day's history entry as { note, helped: [] }.
+export function markFlare(dateKey) {
+  const history = loadHistory()
+  const entry = ensureEntry(history, dateKey)
+  if (!entry.flare) entry.flare = { note: '', helped: [] }
+  if (entry.felt == null) entry.felt = 'bad' // a flare is, by definition, a bad day
+  return saveHistory(history)
+}
+
+export function updateFlare(dateKey, patch) {
+  const history = loadHistory()
+  const entry = ensureEntry(history, dateKey)
+  entry.flare = { note: '', helped: [], ...(entry.flare || {}), ...patch }
+  return saveHistory(history)
+}
+
+export function unmarkFlare(dateKey) {
+  const history = loadHistory()
+  const entry = history.find((h) => h.dateKey === dateKey)
+  if (entry) delete entry.flare
+  return saveHistory(history)
+}
+
+// Toggle a remedy against the CURRENT stored state (not stale UI props), so
+// rapid successive toggles can't clobber each other.
+export function toggleFlareHelped(dateKey, remedy) {
+  const history = loadHistory()
+  const entry = ensureEntry(history, dateKey)
+  entry.flare = { note: '', helped: [], ...(entry.flare || {}) }
+  const set = new Set(entry.flare.helped)
+  set.has(remedy) ? set.delete(remedy) : set.add(remedy)
+  entry.flare.helped = [...set]
+  return saveHistory(history)
 }

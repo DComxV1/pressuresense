@@ -10,6 +10,10 @@ import {
   loadHistory,
   recordPrediction,
   recordCheckIn,
+  markFlare,
+  updateFlare,
+  toggleFlareHelped,
+  unmarkFlare,
 } from './lib/storage.js'
 
 import CurrentCard from './components/CurrentCard.jsx'
@@ -21,6 +25,7 @@ import LocationBar from './components/LocationBar.jsx'
 import HistoryView from './components/HistoryView.jsx'
 import CorrelationView from './components/CorrelationView.jsx'
 import CalibrationCard from './components/CalibrationCard.jsx'
+import FlareLog from './components/FlareLog.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
 import CheckInCard from './components/CheckInCard.jsx'
 
@@ -186,6 +191,15 @@ export default function App() {
         )}
 
         {status === 'ready' && <CheckInCard entry={todayEntry} onChange={onCheckIn} />}
+
+        <FlareLog
+          history={history}
+          todayKey={todayKey}
+          onMark={() => setHistory(markFlare(todayKey))}
+          onUpdate={(patch) => setHistory(updateFlare(todayKey, patch))}
+          onToggleHelped={(remedy) => setHistory(toggleFlareHelped(todayKey, remedy))}
+          onUnmark={() => setHistory(unmarkFlare(todayKey))}
+        />
 
         <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 

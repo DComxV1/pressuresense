@@ -28,6 +28,7 @@ npm run preview  # serve the production build
 - **Self-calibration** — after ~2 weeks of check-ins, suggests the sensitivity that best fits *your own* logged days (replaying each day's sensitivity-independent score against how you felt) and applies it in one tap. This is the core differentiator vs. generic barometer apps.
 - **Condition selector** — pick conditions (osteoarthritis, rheumatoid/inflammatory, fibromyalgia, gout, old injury); the tip engine swaps in mechanism-specific coaching for each.
 - **Daily check-in** — a quick Good / So-so / Painful, with optional detail: a 1–10 pain level plus joint-location and symptom tags (swelling, stiffness, fatigue, brain fog…).
+- **Flare log** — mark a rough day and tag what helped; over time it builds a ranked, personal "what works for me" list and a history of past flares with notes.
 - **Correlation view ("Your pattern")** — a 7/14/30-day chart overlaying actual pressure against your logged symptoms, with a plain-language insight (e.g. "painful days averaged 29.54 inHg vs 30.08 on good days") so you can see your own pattern confirmed.
 - **History log** — records each day's prediction and check-in detail so you can validate the model over time.
 - **Location** — city search or device geolocation (reverse-geocoded to a place name).
