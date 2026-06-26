@@ -1,8 +1,18 @@
-// PWA + notification helpers. Phase 1: install + permission + local test
-// notification (via the service worker). Phase 2 will add push subscription
-// and hand the subscription to the backend sender.
+// PWA + notification helpers: install, permission, local test, and (Phase 2)
+// push subscription registered with the backend sender.
+
+import { WORKER_URL, VAPID_PUBLIC } from './pushConfig.js'
 
 export const BASE = import.meta.env.BASE_URL
+
+function urlBase64ToUint8Array(base64) {
+  const padding = '='.repeat((4 - (base64.length % 4)) % 4)
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(b64)
+  const arr = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+  return arr
+}
 
 export function isIOS() {
   const ua = navigator.userAgent || ''
@@ -52,4 +62,55 @@ export async function showTestNotification() {
     badge: BASE + 'icon-192.png',
     tag: 'pressuresense-test',
   })
+}
+
+// Subscribe to push and register the subscription (+ location + sensitivity)
+// with the backend, which is what actually sends the scheduled alerts.
+export async function subscribeToPush(location, sensitivity) {
+  const reg = await navigator.serviceWorker.ready
+  let sub = await reg.pushManager.getSubscription()
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
+    })
+  }
+  await fetch(`${WORKER_URL}/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subscription: sub.toJSON(), location, sensitivity }),
+  })
+  return sub
+}
+
+// Ask the backend to send a real push right now (verifies the full pipeline).
+export async function sendServerTest() {
+  const reg = await navigator.serviceWorker.ready
+  const sub = await reg.pushManager.getSubscription()
+  if (!sub) return { ok: false, error: 'not subscribed' }
+  const res = await fetch(`${WORKER_URL}/test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subscription: sub.toJSON() }),
+  })
+  return res.json().catch(() => ({ ok: false }))
+}
+
+export async function unsubscribeFromPush() {
+  const reg = await navigator.serviceWorker.ready
+  const sub = await reg.pushManager.getSubscription()
+  if (!sub) return
+  await fetch(`${WORKER_URL}/unsubscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ endpoint: sub.endpoint }),
+  }).catch(() => {})
+  await sub.unsubscribe()
+}
+
+export async function isPushSubscribed() {
+  if (!('serviceWorker' in navigator)) return false
+  const reg = await navigator.serviceWorker.getRegistration()
+  if (!reg) return false
+  return !!(await reg.pushManager.getSubscription())
 }

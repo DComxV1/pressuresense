@@ -1,0 +1,19 @@
+name = "pressuresense-push"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Storage for push subscriptions (id filled in after `wrangler kv namespace create`)
+[[kv_namespaces]]
+binding = "SUBS"
+id = "115c3e75f5af41ac8b6ab914428fc4fe"
+
+# Daily checks: ~6-7am ET (11:00 UTC) for a today heads-up, and ~6-7pm ET
+# (23:00 UTC) for next-day prep. Dedupe means at most one alert per tough day.
+[triggers]
+crons = ["0 11 * * *", "0 23 * * *"]
+
+[vars]
+VAPID_SUBJECT = "mailto:delfin.cuevas@gmail.com"
+APP_URL = "https://dcomxv1.github.io/pressuresense/"
+# VAPID_PUBLIC is set below; the matching private key is a secret (wrangler secret put VAPID_PRIVATE_JWK)
+VAPID_PUBLIC = "BGY_kQJolqU87XztppDuwYzu2P7gTO3Kf815-pYGcDNpp9ttxvm-XTqwaqFMLd1BPjVKJiKTBtdbKmNPQC9-_Iw"

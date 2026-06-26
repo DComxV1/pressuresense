@@ -236,7 +236,7 @@ export default function App() {
           <ConditionSelector selected={conditions || []} onToggle={toggleCondition} />
         )}
 
-        <NotificationsCard />
+        <NotificationsCard location={location} sensitivity={sensitivity} />
 
         <EducationLibrary conditions={conditions || []} />
 
