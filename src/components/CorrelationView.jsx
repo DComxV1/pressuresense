@@ -69,6 +69,7 @@ export default function CorrelationView({ history, unit }) {
   const showComfort = czHigh > czLow
 
   const insight = buildInsight(history, unit)
+  const headline = buildHeadline(history)
 
   return (
     <div className="rounded-2xl border border-border/60 bg-surface p-4">
@@ -87,6 +88,14 @@ export default function CorrelationView({ history, unit }) {
           ))}
         </div>
       </div>
+
+      {headline && (
+        <div className="mb-3 rounded-xl bg-accent/10 p-4">
+          <div className="text-3xl font-bold tracking-tight text-text">{headline.big}</div>
+          <p className="mt-1 text-sm leading-relaxed text-text">{headline.text}</p>
+          <p className="mt-1 text-xs text-muted">{headline.note}</p>
+        </div>
+      )}
 
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Pressure versus logged symptoms over time">
         {showComfort && (
@@ -127,6 +136,61 @@ export default function CorrelationView({ history, unit }) {
       )}
     </div>
   )
+}
+
+function median(values) {
+  const v = values.filter((x) => typeof x === 'number').sort((a, b) => a - b)
+  if (!v.length) return null
+  const mid = Math.floor(v.length / 2)
+  return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2
+}
+
+// The moat: one headline stat, proven from the user's own data — how much more
+// often rough days land on lower-pressure days. Gated behind enough data and
+// both groups present (mirrors the calibration readiness pattern).
+function buildHeadline(history) {
+  const rows = history.filter((h) => h.type && h.minPressure != null)
+  if (rows.length < 8) return null
+  const med = median(rows.map((r) => r.minPressure))
+  const low = rows.filter((r) => r.minPressure < med)
+  const steady = rows.filter((r) => r.minPressure >= med)
+  if (low.length < 2 || steady.length < 2) return null
+  const totalRough = rows.filter((r) => r.type === 'rough').length
+  if (totalRough < 2) return null
+
+  const roughRate = (g) => g.filter((r) => r.type === 'rough').length / g.length
+  const lowR = roughRate(low)
+  const steadyR = roughRate(steady)
+  const note = `Based on ${rows.length} logged days.`
+
+  if (steadyR === 0 && lowR > 0) {
+    return {
+      big: 'Every rough day',
+      text: 'you’ve logged has fallen on a lower-pressure day. Lower pressure clearly tracks with your rough days.',
+      note,
+    }
+  }
+  if (steadyR === 0) return null
+  const ratio = lowR / steadyR
+  if (ratio >= 1.3) {
+    return {
+      big: `${ratio.toFixed(1)}× as often`,
+      text: 'On your lower-pressure days, you’ve logged a rough day this much more often than on steadier days.',
+      note,
+    }
+  }
+  if (ratio <= 0.77) {
+    return {
+      big: 'No clear link yet',
+      text: 'So far your rough days aren’t landing on the lower-pressure days. Pressure may not be your main driver.',
+      note,
+    }
+  }
+  return {
+    big: 'About the same',
+    text: 'So far, rough days are about as common on lower- and higher-pressure days. Keep logging.',
+    note,
+  }
 }
 
 // Plain-language correlation: did lower-pressure days line up with worse days?

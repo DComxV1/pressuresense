@@ -30,6 +30,7 @@ import ConditionSelector from './components/ConditionSelector.jsx'
 import Encouragement from './components/Encouragement.jsx'
 import NotificationsCard from './components/NotificationsCard.jsx'
 import BackupCard from './components/BackupCard.jsx'
+import MomentumCard from './components/MomentumCard.jsx'
 import SettingsDrawer from './components/SettingsDrawer.jsx'
 import HowItWorks from './components/HowItWorks.jsx'
 
@@ -230,6 +231,8 @@ export default function App() {
             onClear={() => setHistory(clearDayLog(todayKey))}
           />
         )}
+
+        <MomentumCard history={history} />
 
         <CorrelationView history={history} unit={unit} />
 
