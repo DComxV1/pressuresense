@@ -13,11 +13,16 @@ export const DEFAULT_CONFIG = {
     absolute: 0.35, // w1
     rate: 0.65, // w2  (rate weighted ~2x absolute)
   },
-  // Absolute pressure factor (hPa). 0 = comfortable, 1 = bad.
+  // Absolute pressure factor. Measured as how far the reading sits BELOW the
+  // user's own rolling baseline (median of the last ~72h), not distance from a
+  // fixed sea-level number. This recenters per location, so it works at any
+  // elevation and adapts to a persistent local pressure regime (FIX 3).
   absolute: {
-    comfortableMin: 1013, // at/above this -> 0 risk (comfort zone 1013-1023)
-    comfortableMax: 1023, // upper edge of the comfort zone (for the chart band)
-    severeLow: 996, // at/below this -> full absolute risk
+    baselineHours: 72, // window for the rolling baseline
+    deviationStart: 2, // hPa below baseline before absolute risk begins
+    deviationSevere: 14, // hPa below baseline -> full absolute risk
+    comfortableMin: 1013, // kept only for the chart's comfort-zone shading
+    comfortableMax: 1023,
   },
   // Rate-of-change factor: pressure change over a trailing 6h window (hPa/6h).
   rate: {
@@ -44,11 +49,28 @@ export const DEFAULT_CONFIG = {
 
 const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x))
 
-export function absoluteFactor(hPa, cfg = DEFAULT_CONFIG) {
-  const { comfortableMin, severeLow } = cfg.absolute
-  if (hPa >= comfortableMin) return 0
-  if (hPa <= severeLow) return 1
-  return (comfortableMin - hPa) / (comfortableMin - severeLow)
+function median(values) {
+  const v = values.filter((x) => typeof x === 'number' && !Number.isNaN(x)).sort((a, b) => a - b)
+  if (!v.length) return null
+  const mid = Math.floor(v.length / 2)
+  return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2
+}
+
+// Rolling baseline = median of the trailing `hours` samples up to and including i.
+function baselineAt(hourly, i, hours) {
+  const start = Math.max(0, i - hours)
+  return median(hourly.slice(start, i + 1).map((p) => p.hPa))
+}
+
+// How far the reading is BELOW the user's rolling baseline. 0 = at/above normal,
+// 1 = far below. Elevation-proof: it's relative to the user's own normal.
+export function absoluteFactor(hPa, baseline, cfg = DEFAULT_CONFIG) {
+  if (baseline == null || hPa == null) return 0
+  const { deviationStart, deviationSevere } = cfg.absolute
+  const below = baseline - hPa // positive when below normal
+  if (below <= deviationStart) return 0
+  if (below >= deviationSevere) return 1
+  return (below - deviationStart) / (deviationSevere - deviationStart)
 }
 
 export function rateFactor(rateHpaPer6h, cfg = DEFAULT_CONFIG) {
@@ -128,7 +150,8 @@ export function computeHourlyRisk(hourly, sensitivity = 50, cfg = DEFAULT_CONFIG
 
   return hourly.map((p, i) => {
     const rate6h = rate6hAt(hourly, i)
-    const absF = absoluteFactor(p.hPa, cfg)
+    const baseline = baselineAt(hourly, i, cfg.absolute.baselineHours)
+    const absF = absoluteFactor(p.hPa, baseline, cfg)
     const rateF = rate6h == null ? 0 : rateFactor(rate6h, cfg)
     let score = pScale * (cfg.weights.absolute * absF + cfg.weights.rate * rateF)
 

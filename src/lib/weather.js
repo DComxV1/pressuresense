@@ -12,11 +12,27 @@
 const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
 
+// Fetch with a timeout so a stalled network call can't leave the UI spinning.
+async function fetchWithTimeout(url, ms = 8000) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  try {
+    return await fetch(url, { signal: ctrl.signal })
+  } finally {
+    clearTimeout(t)
+  }
+}
+
 // Look up candidate locations by name. Returns [{ name, country, admin1, latitude, longitude }]
 export async function geocode(query) {
   const url = `${GEO_URL}?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Geocoding failed (${res.status})`)
+  let res
+  try {
+    res = await fetchWithTimeout(url)
+  } catch {
+    throw new Error('Couldn’t search locations. Check your connection and try again.')
+  }
+  if (!res.ok) throw new Error(`Couldn’t search locations (${res.status}).`)
   const data = await res.json()
   return (data.results || []).map((r) => ({
     name: r.name,
@@ -30,12 +46,13 @@ export async function geocode(query) {
 
 // Turn a coordinate into a place name (used after browser geolocation).
 // Open-Meteo has no reverse geocode, so this uses BigDataCloud's free,
-// keyless, CORS-enabled client endpoint. Falls back to coordinates on failure.
+// keyless, CORS-enabled client endpoint. Falls back to coordinates on failure
+// (including a network stall, via the timeout).
 export async function reverseGeocode(lat, lon) {
   const coords = `${lat.toFixed(2)}, ${lon.toFixed(2)}`
   try {
     const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-    const res = await fetch(url)
+    const res = await fetchWithTimeout(url)
     if (!res.ok) return coords
     const d = await res.json()
     const place = d.city || d.locality || d.principalSubdivision
@@ -55,15 +72,17 @@ export async function fetchPressureSeries(lat, lon) {
     longitude: String(lon),
     hourly: 'pressure_msl,surface_pressure,temperature_2m,relative_humidity_2m',
     forecast_days: '4',
-    past_days: '1',
+    // 3 past days so the rolling baseline (risk.js) has ~72h of history.
+    past_days: '3',
     timezone: 'auto',
   })
-  const res = await fetch(`${FORECAST_URL}?${params.toString()}`)
+  const res = await fetchWithTimeout(`${FORECAST_URL}?${params.toString()}`, 12000)
   if (!res.ok) throw new Error(`Forecast fetch failed (${res.status})`)
   const data = await res.json()
 
   const times = data.hourly?.time || []
   const msl = data.hourly?.pressure_msl || []
+  const surface = data.hourly?.surface_pressure || []
   const temps = data.hourly?.temperature_2m || []
   const humidity = data.hourly?.relative_humidity_2m || []
 
@@ -71,7 +90,11 @@ export async function fetchPressureSeries(lat, lon) {
     .map((t, i) => ({
       // timezone=auto returns local wall-clock strings (no Z); parse as local.
       time: new Date(t),
+      // hPa is sea-level pressure (what people see on weather reports). The
+      // absolute risk factor is measured relative to a rolling baseline, so it
+      // works at any elevation; surface pressure is kept available too.
       hPa: msl[i],
+      surfaceHPa: surface[i],
       tempC: temps[i],
       rh: humidity[i],
     }))

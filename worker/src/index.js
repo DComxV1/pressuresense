@@ -121,10 +121,24 @@ async function sendPush(subscription, payload, env) {
 }
 
 // ---------- risk model (compact port of src/lib/risk.js, pressure-only) ----------
-const CFG = { wAbs: 0.35, wRate: 0.65, comfMin: 1013, severeLow: 996, drop: -2, severeDrop: -8, yellow: 0.3, red: 0.6 }
-const absF = (h) => (h >= CFG.comfMin ? 0 : h <= CFG.severeLow ? 1 : (CFG.comfMin - h) / (CFG.comfMin - CFG.severeLow))
+// Absolute factor is relative to a rolling baseline (median of the last ~72h),
+// so it works at any elevation and adapts to the local regime (FIX 3).
+const CFG = { wAbs: 0.35, wRate: 0.65, baselineHours: 72, devStart: 2, devSevere: 14, drop: -2, severeDrop: -8, yellow: 0.3, red: 0.6 }
+const absF = (hPa, baseline) => {
+  if (baseline == null || hPa == null) return 0
+  const below = baseline - hPa
+  if (below <= CFG.devStart) return 0
+  if (below >= CFG.devSevere) return 1
+  return (below - CFG.devStart) / (CFG.devSevere - CFG.devStart)
+}
 const rateF = (r) =>
   r == null || r >= CFG.drop ? 0 : r <= CFG.severeDrop ? 1 : (CFG.drop - r) / (CFG.drop - CFG.severeDrop)
+function median(values) {
+  const v = values.filter((x) => typeof x === 'number').sort((a, b) => a - b)
+  if (!v.length) return null
+  const mid = Math.floor(v.length / 2)
+  return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2
+}
 function bandFromScore(score, sensitivity) {
   const s = Math.max(0.4, Math.min(2, (sensitivity ?? 50) / 50))
   const y = Math.max(0.05, Math.min(0.95, CFG.yellow / s))
@@ -135,7 +149,7 @@ function bandFromScore(score, sensitivity) {
 async function forecastForDay(location, sensitivity, slot) {
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}` +
-    `&hourly=pressure_msl&forecast_days=2&past_days=1&timezone=auto`
+    `&hourly=pressure_msl&forecast_days=2&past_days=3&timezone=auto`
   const data = await fetch(url).then((r) => r.json())
   const times = data.hourly?.time || []
   const ps = data.hourly?.pressure_msl || []
@@ -143,9 +157,9 @@ async function forecastForDay(location, sensitivity, slot) {
     .map((t, i) => ({ date: t.slice(0, 10), hour: +t.slice(11, 13), hPa: ps[i] }))
     .filter((p) => typeof p.hPa === 'number')
   const dates = [...new Set(hourly.map((h) => h.date))].sort()
-  // dates: [yesterday, today, tomorrow]
-  const today = dates[1] || dates[0]
-  const tomorrow = dates[2] || dates[1]
+  // dates: [...past days, today, tomorrow]; today/tomorrow are the last two.
+  const tomorrow = dates[dates.length - 1]
+  const today = dates[dates.length - 2] || tomorrow
   const targetDate = slot === 'evening' ? tomorrow : today
 
   let worst = 0
@@ -153,7 +167,8 @@ async function forecastForDay(location, sensitivity, slot) {
     if (hourly[i].date !== targetDate) continue
     if (hourly[i].hour < 7 || hourly[i].hour > 22) continue
     const r6 = i >= 6 ? hourly[i].hPa - hourly[i - 6].hPa : null
-    const score = Math.min(1, CFG.wAbs * absF(hourly[i].hPa) + CFG.wRate * rateF(r6))
+    const baseline = median(hourly.slice(Math.max(0, i - CFG.baselineHours), i + 1).map((h) => h.hPa))
+    const score = Math.min(1, CFG.wAbs * absF(hourly[i].hPa, baseline) + CFG.wRate * rateF(r6))
     if (score > worst) worst = score
   }
   return { band: bandFromScore(worst, sensitivity), targetDate, isToday: targetDate === today }
@@ -271,11 +286,18 @@ async function scheduledHandler(event, env) {
       const sub = JSON.parse(raw)
       if (!sub.location) continue
 
-      // Notify only at the subscriber's own local morning/evening hour.
+      // Notify when we're at or past the subscriber's chosen local hour and
+      // haven't already sent for that day. This tolerates a coarse, late, or
+      // jittery cron: a delayed run still catches up, and the per-day dedup
+      // keys stop a double send. Evening is checked first (priority if a late
+      // run makes both due at once).
       const lh = localHour(sub.tz || 'UTC', now)
+      const localDate = localDateKey(sub.tz || 'UTC', now)
+      const mh = sub.morningHour ?? 7
+      const eh = sub.eveningHour ?? 19
       let slot = null
-      if (lh === (sub.morningHour ?? 7)) slot = 'morning'
-      else if (lh === (sub.eveningHour ?? 19)) slot = 'evening'
+      if (lh >= eh && sub.lastEvening !== nextDayKey(localDate)) slot = 'evening'
+      else if (lh >= mh && lh < eh && sub.lastMorning !== localDate) slot = 'morning'
       if (!slot) continue
 
       try {
@@ -319,4 +341,25 @@ function localHour(tz, date) {
   } catch {
     return date.getUTCHours()
   }
+}
+
+// Local calendar date (YYYY-MM-DD) in the given timezone. en-CA formats as
+// YYYY-MM-DD.
+function localDateKey(tz, date) {
+  try {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date)
+  } catch {
+    return date.toISOString().slice(0, 10)
+  }
+}
+
+function nextDayKey(ymd) {
+  const d = new Date(ymd + 'T00:00:00Z')
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
 }
