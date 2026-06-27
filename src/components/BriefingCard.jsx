@@ -16,7 +16,7 @@ export default function BriefingCard({ briefing, tips, explanation }) {
         </span>
         Today’s briefing · {label}
       </div>
-      <p className="mt-2 text-lg font-medium leading-snug text-text">{briefing.text}</p>
+      <p className="mt-2 font-display text-xl font-medium leading-snug text-text">{briefing.text}</p>
       {tips?.length > 0 && (
         <ul className="mt-4 space-y-1.5">
           {tips.map((t, i) => (

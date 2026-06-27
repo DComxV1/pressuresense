@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fraunces: a warm, humanist display face. Used sparingly (per the UI brief) for
+   the briefing headline, the big numbers, and the brand — body stays system-UI
+   for maximum legibility. Self-hosted (variable, latin subset) so it's private
+   and works offline. */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/fraunces-latin.woff2') format('woff2');
+}
+
+/* Honor reduced-motion (the audience + UI brief both ask for it). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 /*
   Design tokens (per the accessibility addendum). Colors are stored as
   space-separated RGB triplets so Tailwind's opacity modifiers (e.g. bg-surface/40)

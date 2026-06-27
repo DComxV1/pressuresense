@@ -15,7 +15,7 @@ export default function MomentumCard({ history }) {
     <div className="rounded-2xl border border-border bg-surface p-5">
       <div className="text-xs uppercase tracking-wide text-muted">This month</div>
       <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-3xl font-bold tracking-tight text-text">{good}</span>
+        <span className="font-display text-4xl font-semibold tracking-tight text-text">{good}</span>
         <span className="text-sm text-muted">good {good === 1 ? 'day' : 'days'} logged</span>
       </div>
       <div className="mt-2 space-y-1 text-sm text-text">

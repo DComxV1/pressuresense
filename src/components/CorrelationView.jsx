@@ -91,7 +91,7 @@ export default function CorrelationView({ history, unit }) {
 
       {headline && (
         <div className="mb-3 rounded-xl bg-accent/10 p-4">
-          <div className="text-3xl font-bold tracking-tight text-text">{headline.big}</div>
+          <div className="font-display text-3xl font-semibold tracking-tight text-text">{headline.big}</div>
           <p className="mt-1 text-sm leading-relaxed text-text">{headline.text}</p>
           <p className="mt-1 text-xs text-muted">{headline.note}</p>
         </div>

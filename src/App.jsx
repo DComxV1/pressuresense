@@ -157,7 +157,7 @@ export default function App() {
     <div className="mx-auto min-h-full max-w-md px-4 pb-16 pt-6">
       <header className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-text">PressureSense</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-text">PressureSense</h1>
           <p className="text-sm text-muted">
             A gentle heads-up on how today might feel, and easy things that help.
           </p>

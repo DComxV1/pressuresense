@@ -17,6 +17,9 @@ export default {
         caution: { DEFAULT: withVar('--caution'), ink: withVar('--caution-ink') },
         high: { DEFAULT: withVar('--high'), ink: withVar('--high-ink') },
       },
+      fontFamily: {
+        display: ['Fraunces', 'Georgia', 'Cambria', 'serif'],
+      },
       minHeight: { touch: '44px' },
       minWidth: { touch: '44px' },
     },

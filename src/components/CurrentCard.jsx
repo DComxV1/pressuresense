@@ -32,7 +32,7 @@ export default function CurrentCard({ current, unit }) {
       <div className="flex items-start justify-between">
         <div>
           <div className="text-xs uppercase tracking-wide text-muted">Current pressure</div>
-          <div className="mt-1 text-4xl font-semibold tabular-nums text-text">
+          <div className="mt-1 font-display text-5xl font-semibold tabular-nums text-text">
             {formatPressure(current.hPa, unit)}
           </div>
           <div className={`mt-1 text-sm ${c.text}`}>
