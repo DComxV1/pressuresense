@@ -109,7 +109,7 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
     <div className="rounded-2xl border border-border bg-surface p-5">
       <div className="text-sm font-medium text-text">Alerts &amp; install</div>
       <p className="mt-1 text-sm text-muted">
-        Get a heads-up before a tougher day, and add PressureSense to your home screen.
+        Get a short morning and evening heads-up on the day’s outlook, and add PressureSense to your home screen.
       </p>
 
       {!installed && installEvent && (

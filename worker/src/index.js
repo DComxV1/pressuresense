@@ -1,8 +1,9 @@
 // PressureSense push backend (Cloudflare Worker).
 //
 //  fetch:     POST /subscribe + /unsubscribe to manage push subscriptions in KV.
-//  scheduled: a couple of times a day, fetch each subscriber's forecast, run the
-//             risk model, and send a web-push when a tougher day is coming.
+//  scheduled: twice a day, fetch each subscriber's forecast, run the risk model,
+//             and send a web-push with the outlook whatever the color
+//             (morning = today, evening = tomorrow).
 //
 // Web push is implemented with the platform Web Crypto API (RFC 8291 aes128gcm
 // + RFC 8292 VAPID), so there are no Node-only dependencies.
@@ -258,7 +259,7 @@ async function handle(request, env) {
         data.subscription,
         JSON.stringify({
           title: 'PressureSense',
-          body: 'Test alert — notifications are working. We’ll only ping you when a tougher day is coming.',
+          body: 'Test alert — notifications are working. You’ll get a short heads-up each morning and evening.',
           url: env.APP_URL,
         }),
         env,
@@ -302,10 +303,9 @@ async function scheduledHandler(event, env) {
 
       try {
         const f = await forecastForDay(sub.location, sub.sensitivity, slot)
-        // Mornings carry the good-day "keep it good" note; evenings are the
-        // heads-up for tomorrow, and only when tomorrow is not green.
-        if (slot === 'morning' && f.band !== 'green') continue
-        if (slot === 'evening' && f.band === 'green') continue
+        // Always send both slots, whatever the color: the morning ping is
+        // today's outlook, the evening ping is tomorrow's. A calm day is still
+        // worth a word, so the user knows what to expect without opening the app.
         const lastKey = slot === 'morning' ? 'lastMorning' : 'lastEvening'
         if (sub[lastKey] === f.targetDate) continue
 
