@@ -22,14 +22,14 @@ export default function HistoryView({ history }) {
 
   if (!entries.length) {
     return (
-      <div className="rounded-2xl border border-border bg-surface p-5 text-sm text-muted">
+      <div className="rounded-2xl border border-border/60 bg-surface p-5 text-sm text-muted">
         No entries yet. Tap how today went above, and your past entries will collect here.
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-4">
+    <div className="rounded-2xl border border-border/60 bg-surface p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="text-xs uppercase tracking-wide text-muted">Past entries</div>
         <div className="inline-flex overflow-hidden rounded-lg border border-border text-xs" role="group" aria-label="Filter by day type">

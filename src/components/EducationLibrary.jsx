@@ -9,10 +9,9 @@ export default function EducationLibrary({ conditions }) {
   const articles = rankedArticles(conditions)
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-4">
-      <div className="mb-1 text-xs uppercase tracking-wide text-muted">Learn</div>
+    <div className="px-1">
       <p className="mb-3 text-sm text-muted">Short, practical reads. General wellness, not medical advice.</p>
-      <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border">
+      <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/60 bg-surface">
         {articles.map((a) => {
           const open = openId === a.id
           return (

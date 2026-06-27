@@ -12,7 +12,7 @@ export default function MomentumCard({ history }) {
   const topFactor = topGoodFactor(history)
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
+    <div className="px-1">
       <div className="text-xs uppercase tracking-wide text-muted">This month</div>
       <div className="mt-1 flex items-baseline gap-2">
         <span className="font-display text-4xl font-semibold tracking-tight text-text">{good}</span>

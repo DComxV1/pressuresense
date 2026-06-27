@@ -293,7 +293,7 @@ export default function App() {
 // the slide-out menu (Settings / Help).
 function SectionLabel({ children }) {
   return (
-    <div className="px-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted">{children}</div>
+    <div className="px-1 pt-6 text-[11px] font-semibold uppercase tracking-wider text-muted">{children}</div>
   )
 }
 

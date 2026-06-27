@@ -7,10 +7,10 @@ next.
 ## Where it stands
 A **fully working, deployed webapp**. Live at https://dcomxv1.github.io/pressuresense/,
 repo https://github.com/DComxV1/pressuresense (public), push worker at
-https://pressuresense-push.delfin-cuevas.workers.dev. Latest work: **UI Moves 1
-+ 3** (the "horizon" hero + the promoted, band-segmented hourly chart); see
-`git log`. The founder's wife is testing it on an iPhone (installed PWA + push
-verified working end to end).
+https://pressuresense-push.delfin-cuevas.workers.dev. Latest work: **the full UI
+direction brief (Moves 1-4)** — the "horizon" hero, the promoted band-segmented
+hourly chart, and the quiet-polish pass; see `git log`. The founder's wife is
+testing it on an iPhone (installed PWA + push verified working end to end).
 
 Built so far (pre-v1.1): the risk engine + briefing + condition coaching, the
 unified **Day Log** (good/so-so/rough + pain + factors + note), correlation view,
@@ -62,16 +62,19 @@ and 10 selectable conditions.
   two endpoints) so the curve reads as "heading into trouble"; kept comfort-zone
   shading, peak marker, legend; no axis clutter. Header renamed "Today's pressure
   shape". Verified with a synthetic green→yellow→red dip.
-- **Move 4 (quiet polish)** — partial (reduced-motion done). Remaining: spacing
-  rhythm between sections, fewer borders (let some content sit on the bg), keep
-  band color = meaning vs accent = interactive.
+- **Move 4 (quiet polish)** ✅: section rhythm (more space before each section
+  header), let reflective readouts sit on the page (the "This month" momentum
+  note and the Learn intro lost their cards; dropped the duplicate "Learn" label
+  and a redundant card-around-a-card in the education list), softened the last
+  full-strength card borders to the shared hairline `border-border/60`. Band
+  color = meaning vs accent = interactive verified intact. (Reduced-motion was
+  already done in Move 2.) **The whole UI direction brief is now complete.**
 
 ## Suggested next steps (in order)
-1. **UI Move 4 polish** — last and lightly: spacing rhythm between sections,
-   fewer borders (let some content sit on the bg), keep band color = meaning vs
-   accent = interactive. (Moves 1 + 3 are done; this is the last UI-brief item.)
-2. **Migraine finish** (#2 remainder) — small.
-3. Then the bigger arcs: **iOS port** (the real Phase 2) and **monetization**
+1. **Migraine finish** (roadmap #2 remainder) — small: per-condition
+   rate-weighting for migraine users + migraine-specific log factors
+   (aura/rescue-med/dark-room/caffeine).
+2. Then the bigger arcs: **iOS port** (the real Phase 2) and **monetization**
    (see git-ignored `pressuresense-monetization.md`: freemium not ads, free
    tier = today/tomorrow + 1 tip + full Day Log; paid = forecast horizon +
    pattern + calibration + history + alerts; data-proves-value paywall after ~2

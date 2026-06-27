@@ -13,7 +13,7 @@ export default function DayLog({ entry, history, onSetType, onUpdate, onToggleFa
   const works = goodFactors(history)
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
+    <div className="rounded-2xl border border-border/60 bg-surface p-5">
       <div className="text-xs uppercase tracking-wide text-muted">Day log</div>
       <p className="mt-0.5 text-sm font-medium text-text">How was today?</p>
 
