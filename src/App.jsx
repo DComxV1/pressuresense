@@ -15,7 +15,7 @@ import {
   clearDayLog,
 } from './lib/storage.js'
 
-import CurrentCard from './components/CurrentCard.jsx'
+import Hero from './components/Hero.jsx'
 import BriefingCard from './components/BriefingCard.jsx'
 import ForecastStrip from './components/ForecastStrip.jsx'
 import HourlyChart from './components/HourlyChart.jsx'
@@ -27,7 +27,6 @@ import CalibrationCard from './components/CalibrationCard.jsx'
 import DayLog from './components/DayLog.jsx'
 import EducationLibrary from './components/EducationLibrary.jsx'
 import ConditionSelector from './components/ConditionSelector.jsx'
-import Encouragement from './components/Encouragement.jsx'
 import NotificationsCard from './components/NotificationsCard.jsx'
 import BackupCard from './components/BackupCard.jsx'
 import MomentumCard from './components/MomentumCard.jsx'
@@ -202,14 +201,22 @@ export default function App() {
 
         {status === 'ready' && model && (
           <>
-            <SectionLabel>Today</SectionLabel>
-            <Encouragement text={encouragement} />
+            <Hero
+              briefing={model.briefing}
+              current={model.current}
+              unit={unit}
+              dateLabel={(model.today?.date || new Date()).toLocaleDateString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+              })}
+              encouragement={encouragement}
+            />
             <BriefingCard
               briefing={model.briefing}
               tips={tipsFor(model.today?.band || 'green', selectedConditions)}
               explanation={model.explanation}
             />
-            <CurrentCard current={model.current} unit={unit} />
             <ForecastStrip
               days={model.days}
               unit={unit}

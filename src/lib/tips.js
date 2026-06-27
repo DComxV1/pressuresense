@@ -39,10 +39,13 @@ export const TIPS = {
 }
 
 // Build the plain-language morning briefing from today's forecast + now.
+// Returns `{ band, headline, text }`: the headline is the short, human verdict
+// that rides over the hero color; the text is the coaching body beneath it.
 export function buildBriefing(today, current) {
   if (!today) {
     return {
       band: current?.band || 'green',
+      headline: 'Reading today’s pressure.',
       text: 'Not enough forecast data yet for a full briefing.',
     }
   }
@@ -52,7 +55,8 @@ export function buildBriefing(today, current) {
   const descriptor = { green: 'a good day', yellow: 'a moderate day', red: 'a tougher day' }[
     today.band
   ]
-  const parts = [`Today looks like ${descriptor}.`]
+  const headline = `Today looks like ${descriptor}.`
+  const parts = []
 
   // Describe the pressure movement.
   if (today.band === 'green') {
@@ -79,7 +83,7 @@ export function buildBriefing(today, current) {
   // Lead action. Every briefing ends with something to *do*.
   parts.push(leadAction(today.band))
 
-  return { band: today.band, text: parts.join(' ') }
+  return { band: today.band, headline, text: parts.join(' ') }
 }
 
 function leadAction(band) {

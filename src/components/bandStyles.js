@@ -9,6 +9,10 @@ export const bandClasses = {
     dot: 'bg-good',
     solid: 'bg-good',
     icon: '✓',
+    // The hero "horizon": a calm wash of the band color, stronger at the top
+    // and easing toward the page so the color is the first thing felt.
+    hero: 'bg-gradient-to-b from-good/25 via-good/10 to-good/[0.04]',
+    heroBorder: 'border-good/30',
   },
   yellow: {
     bg: 'bg-caution/10',
@@ -17,6 +21,8 @@ export const bandClasses = {
     dot: 'bg-caution',
     solid: 'bg-caution',
     icon: '⚠',
+    hero: 'bg-gradient-to-b from-caution/25 via-caution/10 to-caution/[0.04]',
+    heroBorder: 'border-caution/30',
   },
   red: {
     bg: 'bg-high/10',
@@ -25,6 +31,8 @@ export const bandClasses = {
     dot: 'bg-high',
     solid: 'bg-high',
     icon: '◆',
+    hero: 'bg-gradient-to-b from-high/25 via-high/10 to-high/[0.04]',
+    heroBorder: 'border-high/30',
   },
 }
 

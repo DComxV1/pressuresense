@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { bandClasses } from './bandStyles.js'
 import { BAND_META } from '../lib/tips.js'
 
-// The lead element of the app: "what today will feel like + what to do."
+// The coaching detail beneath the hero: the pressure narrative + what to do.
+// The hero carries the headline and band; this card carries the "how".
 export default function BriefingCard({ briefing, tips, explanation }) {
   const [showWhy, setShowWhy] = useState(false)
   if (!briefing) return null
@@ -14,9 +15,9 @@ export default function BriefingCard({ briefing, tips, explanation }) {
         <span className={`${c.text} not-italic`} aria-hidden>
           {c.icon}
         </span>
-        Today’s briefing · {label}
+        What helps today
       </div>
-      <p className="mt-2 font-display text-xl font-medium leading-snug text-text">{briefing.text}</p>
+      <p className="mt-2 text-base leading-relaxed text-text">{briefing.text}</p>
       {tips?.length > 0 && (
         <ul className="mt-4 space-y-1.5">
           {tips.map((t, i) => (
