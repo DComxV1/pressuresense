@@ -175,24 +175,31 @@ async function forecastForDay(location, sensitivity, slot) {
   return { band: bandFromScore(worst, sensitivity), targetDate, isToday: targetDate === today }
 }
 
-function buildMessage(band, isToday) {
+function buildMessage(band, isToday, slot) {
   const when = isToday ? 'Today' : 'Tomorrow'
+  let msg
   if (band === 'red') {
-    return {
+    msg = {
       title: `${when} looks like a tougher day`,
       body: `A sharp pressure drop is coming. Plan a gentler ${isToday ? 'day' : 'one'} and get ahead of it early with your anti-inflammatory routine, feet up when you rest, and plenty of water.`,
     }
-  }
-  if (band === 'yellow') {
-    return {
+  } else if (band === 'yellow') {
+    msg = {
       title: `${when} looks like a moderate day`,
       body: `Some pressure movement ahead. Stay ahead of it: keep hydrated, move in short bursts, and maybe pop on compression socks.`,
     }
+  } else {
+    msg = {
+      title: `${when} looks like a good day`,
+      body: `Pressure stays calm and steady. A good day to be active and keep your routine. Stay hydrated and bank some gentle movement while it's easy.`,
+    }
   }
-  return {
-    title: `${when} looks like a good day`,
-    body: `Pressure stays calm and steady. A good day to be active and keep your routine. Stay hydrated and bank some gentle movement while it's easy.`,
+  // The evening ping doubles as the nudge to log how today felt. Those logs are
+  // what personalize the forecast, so the reminder rides along every evening.
+  if (slot === 'evening') {
+    msg.body += ` And before bed, take a moment to log how today felt. It helps sharpen your forecast.`
   }
+  return msg
 }
 
 // ---------- HTTP ----------
@@ -309,7 +316,7 @@ async function scheduledHandler(event, env) {
         const lastKey = slot === 'morning' ? 'lastMorning' : 'lastEvening'
         if (sub[lastKey] === f.targetDate) continue
 
-        const m = buildMessage(f.band, f.isToday)
+        const m = buildMessage(f.band, f.isToday, slot)
         const { status } = await sendPush(
           sub.subscription,
           JSON.stringify({ title: m.title, body: m.body, url: env.APP_URL }),
