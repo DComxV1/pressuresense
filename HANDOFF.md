@@ -7,9 +7,10 @@ next.
 ## Where it stands
 A **fully working, deployed webapp**. Live at https://dcomxv1.github.io/pressuresense/,
 repo https://github.com/DComxV1/pressuresense (public), push worker at
-https://pressuresense-push.delfin-cuevas.workers.dev. Latest commit: **`2362cd4`**.
-The founder's wife is testing it on an iPhone (installed PWA + push verified
-working end to end).
+https://pressuresense-push.delfin-cuevas.workers.dev. Latest work: **UI Moves 1
++ 3** (the "horizon" hero + the promoted, band-segmented hourly chart); see
+`git log`. The founder's wife is testing it on an iPhone (installed PWA + push
+verified working end to end).
 
 Built so far (pre-v1.1): the risk engine + briefing + condition coaching, the
 unified **Day Log** (good/so-so/rough + pain + factors + note), correlation view,
@@ -49,24 +50,28 @@ and 10 selectable conditions.
 - **Move 2 (typeface)** ✅ (`2362cd4`): self-hosted **Fraunces** on the brand,
   briefing headline, and big numbers; body stays system-UI. + global
   reduced-motion. Verified live; looks great.
-- **Move 1 (the "horizon" hero)** — NOT started. The signature piece: make the
-  day's color the first/biggest thing (a calm band in today's band color with the
-  headline over it), demote the location bar to a slim row. Big top-of-app layout
-  change; held for the founder's eyes.
-- **Move 3 (promote the hourly chart)** — NOT started. Make `HourlyChart.jsx`
-  larger/higher; segment the line stroke by each hour's band so the shape reads as
-  "heading into trouble". Keep comfort-zone shading; no axis clutter.
+- **Move 1 (the "horizon" hero)** ✅ (`beb4b31`): new `Hero.jsx` leads the app
+  with a calm wash of today's band color, the plain-language verdict over it, the
+  live pressure + trend, and the one heads-up that matters (`↓ Dropping after…`).
+  `buildBriefing` now splits a short `headline` from the coaching `text`; the
+  location bar is a slim collapsible row; `BriefingCard` became the "What helps
+  today" card. Dropped the redundant Encouragement banner + `CurrentCard` (folded
+  into the hero; `CurrentCard.jsx` deleted). Verified light/dark + all 3 bands.
+- **Move 3 (promote the hourly chart)** ✅ (`HourlyChart.jsx`): taller frame
+  (168 vs 110), the line stroke is now segmented by each hour's band (worse of the
+  two endpoints) so the curve reads as "heading into trouble"; kept comfort-zone
+  shading, peak marker, legend; no axis clutter. Header renamed "Today's pressure
+  shape". Verified with a synthetic green→yellow→red dip.
 - **Move 4 (quiet polish)** — partial (reduced-motion done). Remaining: spacing
   rhythm between sections, fewer borders (let some content sit on the bg), keep
   band color = meaning vs accent = interactive.
 
 ## Suggested next steps (in order)
-1. **UI Move 1 (hero)** then **Move 3 (chart)** — the remaining headline visual
-   work. Build, screenshot, get founder feedback, iterate. (This is where we
-   paused; founder was asked "build the hero + chart next?")
-2. **Move 4 polish** — last and lightly.
-3. **Migraine finish** (#2 remainder) — small.
-4. Then the bigger arcs: **iOS port** (the real Phase 2) and **monetization**
+1. **UI Move 4 polish** — last and lightly: spacing rhythm between sections,
+   fewer borders (let some content sit on the bg), keep band color = meaning vs
+   accent = interactive. (Moves 1 + 3 are done; this is the last UI-brief item.)
+2. **Migraine finish** (#2 remainder) — small.
+3. Then the bigger arcs: **iOS port** (the real Phase 2) and **monetization**
    (see git-ignored `pressuresense-monetization.md`: freemium not ads, free
    tier = today/tomorrow + 1 tip + full Day Log; paid = forecast horizon +
    pattern + calibration + history + alerts; data-proves-value paywall after ~2
