@@ -1,12 +1,52 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 // Slide-out menu panel. Holds the setup + help cards so the main screen stays
-// focused on today and tracking. Closes on backdrop click or Escape.
+// focused on today and tracking.
+//
+// Accessibility (W3C older-users guidance): when it opens, focus moves into the
+// drawer; Tab is trapped inside; Escape closes it; and on close, focus returns
+// to whatever opened it (the menu button).
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
 export default function SettingsDrawer({ open, onClose, children }) {
+  const panelRef = useRef(null)
+  const restoreRef = useRef(null)
+
+  // Move focus in on open; restore it on close.
+  useEffect(() => {
+    if (open) {
+      restoreRef.current = document.activeElement
+      // Defer so the panel is laid out before we focus into it.
+      const t = setTimeout(() => {
+        const els = panelRef.current?.querySelectorAll(FOCUSABLE)
+        els?.[0]?.focus()
+      }, 50)
+      return () => clearTimeout(t)
+    }
+    restoreRef.current?.focus?.()
+  }, [open])
+
+  // Escape to close; Tab trapped within the panel.
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const els = panelRef.current?.querySelectorAll(FOCUSABLE)
+      if (!els || !els.length) return
+      const first = els[0]
+      const last = els[els.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
@@ -25,6 +65,7 @@ export default function SettingsDrawer({ open, onClose, children }) {
         }`}
       />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Menu"

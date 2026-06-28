@@ -181,17 +181,17 @@ function buildMessage(band, isToday, slot) {
   if (band === 'red') {
     msg = {
       title: `${when} looks like a tougher day`,
-      body: `A sharp pressure drop is coming. Plan a gentler ${isToday ? 'day' : 'one'} and get ahead of it early with your anti-inflammatory routine, feet up when you rest, and plenty of water.`,
+      body: `A sharp pressure drop is coming. A good ${isToday ? 'day' : 'one'} to keep things gentle. Follow your clinician-approved pain plan as directed, put your feet up when you rest, and drink fluids steadily unless your clinician has limited them.`,
     }
   } else if (band === 'yellow') {
     msg = {
       title: `${when} looks like a moderate day`,
-      body: `Some pressure movement ahead. Stay ahead of it: keep hydrated, move in short bursts, and maybe pop on compression socks.`,
+      body: `Some pressure movement ahead. A few gentle steps may help: drink fluids steadily (unless your clinician has limited them), move in short bursts, and rest when you need to.`,
     }
   } else {
     msg = {
       title: `${when} looks like a good day`,
-      body: `Pressure stays calm and steady. A good day to be active and keep your routine. Stay hydrated and bank some gentle movement while it's easy.`,
+      body: `Pressure stays calm and steady. A good day to be active and keep your routine. Drink fluids steadily and bank some gentle movement while it's easy.`,
     }
   }
   // The evening ping doubles as the nudge to log how today felt. Those logs are

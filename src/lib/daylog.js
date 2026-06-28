@@ -13,7 +13,9 @@ export const TYPE_META = {
 }
 
 // The "what did you do" chips are the SAME for every day type — these apply to
-// good days (repeat the wins) as much as rough ones.
+// good days (repeat the wins) as much as rough ones. These double as the
+// vocabulary the Flare Plan marks as "helped", so plan actions map onto these.
+// Existing labels are kept stable so older logged entries stay matched.
 export const FACTORS = [
   'Hydration',
   'Compression socks',
@@ -24,6 +26,9 @@ export const FACTORS = [
   'Ice',
   'Anti-inflammatory',
   'Stretching',
+  'Paced chores',
+  'Screen breaks',
+  'Saline rinse',
   'Acted early',
   'Lighter day',
 ]

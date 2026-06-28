@@ -57,7 +57,7 @@ export async function requestNotificationPermission() {
 export async function showTestNotification() {
   const reg = await navigator.serviceWorker.ready
   await reg.showNotification('PressureSense', {
-    body: 'Notifications are on. We’ll tap you on the shoulder when a tougher day is on the way.',
+    body: 'Notifications are on. You’ll get a short morning and evening reminder.',
     icon: BASE + 'icon-192.png',
     badge: BASE + 'icon-192.png',
     tag: 'pressuresense-test',

@@ -38,7 +38,7 @@ export default function HistoryView({ history }) {
               key={v}
               onClick={() => setFilter(v)}
               aria-pressed={filter === v}
-              className={`px-2.5 py-1 ${filter === v ? 'bg-accent text-white' : 'text-muted'}`}
+              className={`min-h-touch px-3.5 text-sm ${filter === v ? 'bg-accent text-white' : 'text-muted'}`}
             >
               {l}
             </button>
@@ -73,7 +73,7 @@ export default function HistoryView({ history }) {
       {shown.length > PAGE && (
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="mt-3 text-sm text-muted underline underline-offset-4 hover:text-text"
+          className="mt-2 inline-flex min-h-touch items-center text-sm text-muted underline underline-offset-4 hover:text-text"
         >
           {showAll ? 'Show less' : `Show all ${shown.length}`}
         </button>

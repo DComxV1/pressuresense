@@ -23,7 +23,7 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
         {onboarding && (
           <button
             onClick={onDismiss}
-            className="shrink-0 text-xs text-muted underline underline-offset-4 hover:text-text"
+            className="-mr-2 -mt-1 inline-flex min-h-touch shrink-0 items-center rounded-lg px-3 text-sm text-muted underline underline-offset-4 hover:text-text"
           >
             Skip
           </button>
@@ -39,7 +39,7 @@ export default function ConditionSelector({ selected, onToggle, onboarding, onDi
               onClick={() => onToggle(c.key)}
               aria-pressed={on}
               title={c.blurb}
-              className={`rounded-full border px-3 py-1.5 text-sm transition ${
+              className={`inline-flex min-h-touch items-center rounded-full border px-4 text-sm transition ${
                 on
                   ? 'border-accent bg-accent text-white'
                   : 'border-border bg-transparent text-text hover:border-muted'

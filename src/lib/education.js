@@ -16,9 +16,9 @@ export const ARTICLES = [
       'Take a short walk after you’ve been sitting a while. Even 5 to 10 minutes helps.',
       'Do ankle pumps (point and flex your feet) while you’re seated.',
       'Put your feet up above hip level when you rest, so gravity can help things drain.',
-      'Compression socks (15 to 20 mmHg) help push blood back up during long spells of sitting or standing.',
+      'If a clinician has said compression is safe for you, compression socks can help push blood back up during long spells of sitting or standing.',
     ],
-    note: 'Swelling that keeps coming back can have causes that have nothing to do with the weather, so it’s worth having a doctor take a look.',
+    note: 'Swelling that keeps coming back can have causes that have nothing to do with the weather, so it’s worth having a doctor take a look. Sudden swelling, redness, warmth, or severe pain in one leg needs urgent care. Check with a clinician before using compression if you have circulation problems, diabetes, nerve pain, or skin wounds.',
   },
   {
     id: 'mobility-in-a-flare',
@@ -57,11 +57,12 @@ export const ARTICLES = [
     intro:
       'Diet won’t replace your treatment, but a few habits have reasonable evidence for inflammatory joint pain.',
     tips: [
-      'Omega-3s: oily fish like salmon or sardines, or a good fish-oil supplement.',
-      'Stay well hydrated, especially on low-pressure days.',
+      'Omega-3s, mainly from oily fish like salmon or sardines.',
+      'Drink fluids steadily, unless your clinician has told you to limit them.',
       'Lean toward whole foods; go easy on heavily processed food and excess alcohol.',
-      'For gout, watch known triggers (high-purine foods, alcohol, sugary drinks).',
+      'For gout, watch your known triggers (high-purine foods, alcohol, sugary drinks).',
     ],
+    note: 'Supplements are not risk-free. Check with your clinician or pharmacist before starting any supplement, especially if you take other medicines (for example blood thinners) or have kidney, liver, or heart conditions.',
   },
   {
     id: 'sleep-and-pain',
@@ -86,10 +87,10 @@ export const ARTICLES = [
     intro:
       'Barometric swings are a common migraine trigger. You can often blunt one by staying ahead of it rather than reacting once it hits.',
     tips: [
-      'Hydrate steadily through the day; being even a little dry makes things worse.',
+      'Drink fluids steadily through the day, unless your clinician has limited them; for some people, being even a little dry makes things worse.',
       'Keep sleep, meals, and caffeine on their usual schedule.',
       'Dim bright light and take screen breaks when a swing is forecast.',
-      'Have your usual remedy on hand before the worst of it arrives.',
+      'Have your usual migraine plan, as directed, on hand before the worst of it arrives.',
     ],
   },
   {
@@ -101,7 +102,7 @@ export const ARTICLES = [
     intro:
       'When pressure shifts, sinuses can block up and ache. A few simple habits keep them clearer.',
     tips: [
-      'Stay well hydrated to keep things thin and moving.',
+      'Drink fluids steadily, unless your clinician has limited them, to keep things thin and moving.',
       'A saline rinse or spray helps flush the sinuses out.',
       'Steam from a warm shower or a bowl of hot water can open things up.',
       'Gentle warmth over the cheeks and brow eases the ache.',

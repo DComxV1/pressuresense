@@ -69,7 +69,7 @@ export default function DayLog({ entry, history, onSetType, onUpdate, onToggleFa
                     key={f}
                     onClick={() => onToggleFactor(f)}
                     aria-pressed={sel}
-                    className={`rounded-full border px-2.5 py-1 text-xs transition ${
+                    className={`inline-flex min-h-touch items-center rounded-full border px-3.5 text-sm transition ${
                       sel ? 'border-good bg-good text-white' : 'border-border text-muted hover:border-muted'
                     }`}
                   >
@@ -89,7 +89,10 @@ export default function DayLog({ entry, history, onSetType, onUpdate, onToggleFa
             className="w-full resize-none rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text placeholder-muted outline-none focus:border-accent"
           />
 
-          <button onClick={onClear} className="text-sm text-muted underline underline-offset-4">
+          <button
+            onClick={onClear}
+            className="inline-flex min-h-touch items-center text-sm text-muted underline underline-offset-4"
+          >
             Clear today’s entry
           </button>
         </div>

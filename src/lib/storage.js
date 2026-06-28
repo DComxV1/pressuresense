@@ -16,11 +16,14 @@ export const DEFAULT_SETTINGS = {
   conditions: [], // selected condition keys (A1); [] => onboarding prompt
   onboarded: false, // dismissed the condition prompt at least once
   includeWeather: false, // fold temperature/humidity/temp-swing into the score (A7)
-  morningHour: 7, // local hour for the good-day note (0-23)
-  eveningHour: 19, // local hour for the tougher-day heads-up (0-23)
-  // Seeded so the dashboard populates on first run; change via "Use my location"
-  // or city search.
+  morningHour: 7, // local hour for the morning note (0-23)
+  eveningHour: 19, // local hour for the evening heads-up (0-23)
+  planActions: ['move', 'warmth', 'rest', 'pace', 'fluids'], // My Flare Plan (plan.js keys)
+  // Sample location so the dashboard shows something on first run. Flagged as
+  // demo until the user sets their own, so it's never presented as real (see
+  // App's demo banner). Cleared to a real place via "Use my location"/search.
   location: { label: 'Nags Head, NC', latitude: 35.957, longitude: -75.624 },
+  locationIsDemo: true,
 }
 
 export function loadSettings() {

@@ -33,7 +33,7 @@ export default function BriefingCard({ briefing, tips, explanation }) {
           <button
             onClick={() => setShowWhy((v) => !v)}
             aria-expanded={showWhy}
-            className="text-sm font-medium text-muted underline decoration-border underline-offset-4 hover:text-text"
+            className="inline-flex min-h-touch items-center text-sm font-medium text-muted underline decoration-border underline-offset-4 hover:text-text"
           >
             {showWhy ? 'Hide reasoning' : `Why ${label.toLowerCase()}?`}
           </button>

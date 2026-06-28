@@ -2,7 +2,29 @@ import { useState } from 'react'
 import { BAND_META } from '../lib/tips.js'
 import { DEFAULT_CONFIG } from '../lib/risk.js'
 import { TYPE_BAND } from '../lib/daylog.js'
+import { patternConfidence } from '../lib/calibrate.js'
 import { formatPressure, hPaToInHg } from '../lib/format.js'
+
+// A small, honest confidence chip + line. Neutral styling (not a risk band) so
+// it reads as "how well we know your pattern", never as today's risk.
+const DOT = {
+  none: 'bg-muted',
+  forming: 'bg-accent',
+  stronger: 'bg-good',
+  nolink: 'bg-muted',
+}
+function ConfidenceNote({ confidence }) {
+  if (!confidence) return null
+  return (
+    <div className="mb-3">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-muted">
+        <span aria-hidden className={`h-2 w-2 rounded-full ${DOT[confidence.level] || 'bg-muted'}`} />
+        {confidence.label}
+      </span>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted">{confidence.blurb}</p>
+    </div>
+  )
+}
 
 // A3: overlay the logged day type against actual pressure over time. Seeing your
 // own pattern confirmed is the trust/retention payoff. Pressure line on top,
@@ -27,12 +49,14 @@ function buildAxis(history, days) {
 export default function CorrelationView({ history, unit }) {
   const [days, setDays] = useState(14)
   const loggedCount = history.filter((h) => h.type || h.minPressure != null).length
+  const confidence = patternConfidence(history)
 
   if (loggedCount < 2) {
     return (
       <div className="rounded-2xl border border-border/60 bg-surface p-5">
-        <div className="text-xs uppercase tracking-wide text-muted">Your pattern</div>
-        <p className="mt-2 text-sm text-muted">
+        <div className="mb-3 text-xs uppercase tracking-wide text-muted">Your pattern</div>
+        <ConfidenceNote confidence={confidence} />
+        <p className="text-sm text-muted">
           As you log how you feel each day, this chart lays your symptoms over the actual
           pressure, so you can start to see your own pattern. Check back in a few days.
         </p>
@@ -81,13 +105,15 @@ export default function CorrelationView({ history, unit }) {
               key={r}
               onClick={() => setDays(r)}
               aria-pressed={days === r}
-              className={`px-2.5 py-1 ${days === r ? 'bg-accent text-white' : 'text-muted'}`}
+              className={`min-h-touch px-3.5 text-sm ${days === r ? 'bg-accent text-white' : 'text-muted'}`}
             >
               {r}d
             </button>
           ))}
         </div>
       </div>
+
+      <ConfidenceNote confidence={confidence} />
 
       {headline && (
         <div className="mb-3 rounded-xl bg-accent/10 p-4">
@@ -166,7 +192,7 @@ function buildHeadline(history) {
   if (steadyR === 0 && lowR > 0) {
     return {
       big: 'Every rough day',
-      text: 'you’ve logged has fallen on a lower-pressure day. Lower pressure clearly tracks with your rough days.',
+      text: 'you’ve logged has fallen on a lower-pressure day. Lower pressure has lined up with your rough days. This is your pattern, not a rule for everyone.',
       note,
     }
   }

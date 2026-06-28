@@ -4,6 +4,7 @@ import { computeHourlyRisk, currentConditions, dailyForecast } from './lib/risk.
 import { buildBriefing, tipsFor, buildExplanation, goodStreak, buildEncouragement } from './lib/tips.js'
 import { CONDITION_MAP } from './lib/conditions.js'
 import { suggestSensitivity } from './lib/calibrate.js'
+import { CLINICIAN_CHECK } from './lib/safety.js'
 import {
   loadSettings,
   saveSettings,
@@ -16,6 +17,9 @@ import {
 } from './lib/storage.js'
 
 import Hero from './components/Hero.jsx'
+import FlarePlan from './components/FlarePlan.jsx'
+import SafetyCard from './components/SafetyCard.jsx'
+import ReportCard from './components/ReportCard.jsx'
 import BriefingCard from './components/BriefingCard.jsx'
 import ForecastStrip from './components/ForecastStrip.jsx'
 import HourlyChart from './components/HourlyChart.jsx'
@@ -43,7 +47,7 @@ export default function App() {
   const [selectedKey, setSelectedKey] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize, morningHour, eveningHour } =
+  const { unit, sensitivity, location, conditions, onboarded, includeWeather, theme, textSize, morningHour, eveningHour, planActions, locationIsDemo } =
     settings
   const selectedConditions = (conditions || []).map((k) => CONDITION_MAP[k]).filter(Boolean)
   // Stays up through the whole pick; dismissed only by Done/Skip, not by the
@@ -138,7 +142,7 @@ export default function App() {
       async (pos) => {
         const { latitude, longitude } = pos.coords
         const label = await reverseGeocode(latitude, longitude)
-        update({ location: { label, latitude, longitude } })
+        update({ location: { label, latitude, longitude }, locationIsDemo: false })
         setLocating(false)
       },
       (err) => {
@@ -173,10 +177,17 @@ export default function App() {
       <div className="space-y-4">
         <LocationBar
           location={location}
-          onPick={(loc) => update({ location: loc })}
+          onPick={(loc) => update({ location: loc, locationIsDemo: false })}
           onUseDevice={useDeviceLocation}
           locating={locating}
         />
+
+        {locationIsDemo && location && (
+          <div className="rounded-xl border border-accent/40 bg-accent/10 p-3 text-sm text-text">
+            <span className="font-medium">Showing sample data for {location.label}.</span> Tap “Change”
+            above and set your location to see your own forecast.
+          </div>
+        )}
 
         {showOnboarding && (
           <ConditionSelector
@@ -212,11 +223,32 @@ export default function App() {
               })}
               encouragement={encouragement}
             />
+            <FlarePlan
+              band={model.today?.band || 'green'}
+              planKeys={planActions || []}
+              factors={todayEntry?.factors || []}
+              onToggleFactor={(f) => setHistory(toggleDayFactor(todayKey, f))}
+              onChangePlan={(keys) => update({ planActions: keys })}
+            />
             <BriefingCard
               briefing={model.briefing}
               tips={tipsFor(model.today?.band || 'green', selectedConditions)}
               explanation={model.explanation}
             />
+            {(model.today?.band || 'green') !== 'green' && (
+              <a
+                href="#safety-help"
+                className="flex min-h-touch items-center gap-2 rounded-xl border border-border/60 bg-surface px-4 text-sm text-text hover:bg-surface-2"
+              >
+                <span aria-hidden className="text-high-ink">
+                  ✚
+                </span>
+                When to get help now
+                <span aria-hidden className="ml-auto text-muted">
+                  →
+                </span>
+              </a>
+            )}
             <ForecastStrip
               days={model.days}
               unit={unit}
@@ -245,9 +277,12 @@ export default function App() {
 
         <HistoryView history={history} />
 
+        <ReportCard />
+
         <CalibrationCard result={calibration} onApply={(v) => update({ sensitivity: v })} />
 
         <SectionLabel>Learn</SectionLabel>
+        <SafetyCard />
         <EducationLibrary conditions={conditions || []} />
 
         <Disclaimer />
@@ -300,10 +335,10 @@ function SectionLabel({ children }) {
 function Disclaimer() {
   return (
     <p className="px-1 text-[11px] leading-relaxed text-muted">
-      The link between pressure and pain is real for a lot of people, but it’s individual, and
-      this is general wellness guidance, not medical advice or a diagnosis. Swelling and pain
-      that stick around or keep coming back, especially in the ankles, can have causes that
-      have nothing to do with the weather, so they’re always worth a chat with a doctor.
+      The link between pressure and pain is real for a lot of people, but it tends to be modest and
+      individual, and this is general wellness support, not medical advice or a diagnosis. {CLINICIAN_CHECK}{' '}
+      Swelling and pain that stick around or keep coming back, especially in the ankles, can have causes
+      that have nothing to do with the weather, so they’re always worth a chat with a doctor.
     </p>
   )
 }

@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { bandClasses, trendArrow } from './bandStyles.js'
 import { BAND_META } from '../lib/tips.js'
 import { formatPressure, hPaToInHg, hourLabel } from '../lib/format.js'
+
+const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window
 
 const trendWord = { rising: 'Rising', falling: 'Falling', steady: 'Steady' }
 
@@ -26,12 +29,35 @@ function forwardLabel(forward) {
 // heads-up that matters most ("dropping after 2 PM"). The coaching detail lives
 // in the card beneath it.
 export default function Hero({ briefing, current, unit, dateLabel, encouragement }) {
+  const [speaking, setSpeaking] = useState(false)
   if (!briefing) return null
   const c = bandClasses[briefing.band]
   const meta = BAND_META[briefing.band] || {}
   const label = meta.label || briefing.band.toUpperCase()
   const fwd = forwardLabel(current?.forward)
   const fwdAccent = current?.forward?.trend === 'dropping'
+
+  function toggleSpeak() {
+    const synth = window.speechSynthesis
+    if (!synth) return
+    if (synth.speaking) {
+      synth.cancel()
+      setSpeaking(false)
+      return
+    }
+    const parts = [
+      `Today, ${label}.`,
+      briefing.headline,
+      briefing.text,
+      encouragement || '',
+    ].filter(Boolean)
+    const u = new SpeechSynthesisUtterance(parts.join(' '))
+    u.rate = 0.95
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    setSpeaking(true)
+    synth.speak(u)
+  }
 
   return (
     <section
@@ -75,16 +101,28 @@ export default function Hero({ briefing, current, unit, dateLabel, encouragement
         </div>
       )}
 
-      {fwd && (
-        <div
-          className={`mt-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm ${
-            fwdAccent ? `bg-surface/70 ${c.text} font-medium` : 'bg-surface/60 text-muted'
-          }`}
-        >
-          <span aria-hidden>{fwdAccent ? '↓' : '→'}</span>
-          {fwd}
-        </div>
-      )}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {fwd && (
+          <div
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm ${
+              fwdAccent ? `bg-surface/70 ${c.text} font-medium` : 'bg-surface/60 text-muted'
+            }`}
+          >
+            <span aria-hidden>{fwdAccent ? '↓' : '→'}</span>
+            {fwd}
+          </div>
+        )}
+        {canSpeak && (
+          <button
+            onClick={toggleSpeak}
+            aria-pressed={speaking}
+            className="ml-auto inline-flex min-h-touch items-center gap-1.5 rounded-lg bg-surface/70 px-3 text-sm text-text hover:bg-surface"
+          >
+            <span aria-hidden>{speaking ? '⏹' : '🔊'}</span>
+            {speaking ? 'Stop' : 'Read aloud'}
+          </button>
+        )}
+      </div>
     </section>
   )
 }

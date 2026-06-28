@@ -7,10 +7,29 @@ next.
 ## Where it stands
 A **fully working, deployed webapp**. Live at https://dcomxv1.github.io/pressuresense/,
 repo https://github.com/DComxV1/pressuresense (public), push worker at
-https://pressuresense-push.delfin-cuevas.workers.dev. Latest work: **the full UI
-direction brief (Moves 1-4)** — the "horizon" hero, the promoted band-segmented
-hourly chart, and the quiet-polish pass; see `git log`. The founder's wife is
-testing it on an iPhone (installed PWA + push verified working end to end).
+https://pressuresense-push.delfin-cuevas.workers.dev. Latest work: a **safety +
+senior-first pass** on top of the completed UI brief (Moves 1-4). The founder's
+wife is testing it on an iPhone (installed PWA + push verified working end to end).
+
+### Safety + senior pass (most recent)
+- **Clinician-safe copy** everywhere (tips, conditions, education, and the push
+  worker): no "hydrate aggressively / start your anti-inflammatory routine /
+  wear compression socks / 15-20 mmHg". Shared voice in `src/lib/safety.js`.
+- **"When to get help now"** card (`SafetyCard.jsx`) in Learn + a rough-day link
+  from the briefing; 911 / 988.
+- **Today's Plan / My Flare Plan** (`FlarePlan.jsx` + `src/lib/plan.js`,
+  `settings.planActions`): pick safe actions; on yellow/red show up to 5; ticking
+  one marks "helped" and writes the matching Day Log factor.
+- **Pattern confidence** state (`patternConfidence()` in calibrate.js): Still
+  learning / Pattern forming / Stronger pattern / No clear pressure link yet.
+  Softened universal causal claims to personal framing.
+- **Doctor/caregiver report** (`ReportCard.jsx` + `src/lib/report.js`): CSV +
+  printable PDF, with a "not a diagnosis" disclaimer.
+- **Accessibility**: all tap targets >=44px; drawer focus trap + Escape + restore
+  focus to the menu button; optional Read-aloud briefing (Web Speech).
+- **Privacy + honesty**: NotificationsCard discloses what's sent on enabling;
+  the seeded Nags Head location is flagged as sample data (banner) until the user
+  sets their own (`settings.locationIsDemo`).
 
 Built so far (pre-v1.1): the risk engine + briefing + condition coaching, the
 unified **Day Log** (good/so-so/rough + pain + factors + note), correlation view,

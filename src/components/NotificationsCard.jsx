@@ -111,6 +111,11 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
       <p className="mt-1 text-sm text-muted">
         Get a short morning and evening heads-up on the day’s outlook, and add PressureSense to your home screen.
       </p>
+      <p className="mt-2 rounded-lg bg-surface-2 p-3 text-xs leading-relaxed text-muted">
+        Your daily logs stay on this device. If you turn on alerts, we send your approximate location and
+        alert settings to our notification service so it can send your morning and evening reminders. You
+        can turn alerts off anytime.
+      </p>
 
       {!installed && installEvent && (
         <button
@@ -144,14 +149,18 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
               >
                 Send a test alert
               </button>
-              <button onClick={turnOff} disabled={busy} className="text-sm text-muted underline underline-offset-4">
+              <button
+                onClick={turnOff}
+                disabled={busy}
+                className="inline-flex min-h-touch items-center text-sm text-muted underline underline-offset-4"
+              >
                 Turn off
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <label className="text-sm text-muted">
-                Good-morning note
+                Morning reminder
                 <select
                   value={morningHour}
                   onChange={(e) => onHours({ morningHour: Number(e.target.value) })}
@@ -165,7 +174,7 @@ export default function NotificationsCard({ location, sensitivity, morningHour, 
                 </select>
               </label>
               <label className="text-sm text-muted">
-                Evening heads-up
+                Evening reminder
                 <select
                   value={eveningHour}
                   onChange={(e) => onHours({ eveningHour: Number(e.target.value) })}

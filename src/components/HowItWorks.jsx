@@ -33,7 +33,7 @@ const FAQ = [
   },
   {
     q: 'How do notifications work?',
-    a: 'A gentle good-morning note on calm days, and an evening heads-up when tomorrow looks tougher, at the local times you choose. They arrive even when the app is closed.',
+    a: 'A short morning note about today and an evening note about tomorrow, at the local times you choose, whatever the forecast looks like. They arrive even when the app is closed. Your daily logs stay on this device; if you turn alerts on, only your approximate location and alert settings go to the notification service so it can send the reminders.',
   },
   {
     q: 'Will I lose my data?',
@@ -59,7 +59,7 @@ export default function HowItWorks() {
               <button
                 onClick={() => setOpen(isOpen ? null : i)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left hover:bg-surface-2"
+                className="flex min-h-touch w-full items-center justify-between gap-3 px-3 py-3 text-left hover:bg-surface-2"
               >
                 <span className="text-sm font-medium text-text">{item.q}</span>
                 <span className="shrink-0 text-muted" aria-hidden>

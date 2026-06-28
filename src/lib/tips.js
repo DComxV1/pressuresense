@@ -17,24 +17,24 @@ export const BAND_META = {
 export const TIPS = {
   green: [
     'A good day to be active. Keep your normal routine.',
-    'A solid day to bank some movement: a longer walk pays off.',
-    'Stay hydrated and keep the habits going.',
+    'A solid day to bank some gentle movement, like a longer walk if that suits you.',
+    'Drink fluids steadily, unless your clinician has told you to limit them.',
   ],
   yellow: [
-    'Hydrate steadily through the day.',
+    'Drink fluids steadily through the day, unless your clinician has told you to limit them.',
     'Keep moving in short bursts, and try not to sit for too long.',
-    'Wear compression socks if sitting or standing a while.',
-    'Do gentle stretching, especially ankles and calves.',
-    'Take a short walk after meals to keep circulation moving.',
+    'Gentle stretching or range-of-motion, especially ankles and calves.',
+    'Take a short walk after meals if you are up to it.',
+    'If a clinician has said compression is safe for you, it can help during long spells of sitting or standing.',
   ],
   red: [
-    'Get ahead of the inflammation early. Don’t wait for the flare to hit.',
+    'Follow your clinician-approved pain or anti-inflammatory plan as directed.',
     'Favor gentle movement over intense activity today.',
-    'Elevate feet when resting to help ankle drainage.',
-    'Apply warmth to stiff joints.',
-    'Extra hydration throughout the day.',
-    'Wear compression socks during the day.',
+    'Put your feet up when you rest.',
+    'Try gentle warmth on stiff joints.',
+    'Keep fluids steady through the day, unless your clinician has told you to limit them.',
     'Plan a lighter day and pace yourself.',
+    'Use compression only if a clinician has told you it is safe for you.',
   ],
 }
 
@@ -74,9 +74,9 @@ export function buildBriefing(today, current) {
   // injects "start your measures" urgency into an otherwise good day (A9).
   if (current && today.band !== 'green') {
     if (current.trend === 'falling') {
-      parts.push('It’s already easing now, so start your measures early.')
+      parts.push('It’s already easing now, so it may help to start your usual steps early.')
     } else if (current.trend === 'rising') {
-      parts.push('Pressure is rising now, which usually brings relief.')
+      parts.push('Pressure is rising now, which often brings relief.')
     }
   }
 
@@ -89,8 +89,8 @@ export function buildBriefing(today, current) {
 function leadAction(band) {
   if (band === 'green') return 'Make the most of it. It’s a good day to be active.'
   if (band === 'yellow')
-    return 'A few small habits will keep you ahead of it: drink plenty of water, keep moving in short bursts, and maybe pop on compression socks.'
-  return 'Plan a gentler day and get ahead of it early. Start your anti-inflammatory routine, put your feet up when you rest, and drink plenty of water.'
+    return 'A few small, gentle steps may help: drink fluids steadily (unless your clinician has limited them), keep moving in short bursts, and rest when you need to.'
+  return 'A good day to keep things gentle. Follow your clinician-approved pain plan as directed, put your feet up when you rest, and drink fluids steadily unless your clinician has limited them.'
 }
 
 // Consecutive recent good days (felt good, else predicted green), counted from
@@ -155,7 +155,7 @@ export function buildExplanation(today, current, unit = 'inHg') {
     reasons.push(
       `Pressure falls about ${Math.abs(today.steepestRate).toFixed(1)} hPa over 6 hours${
         today.steepestRateHour ? ` around ${hourLabel(today.steepestRateHour)}` : ''
-      }. A falling trend is the strongest pain trigger, so it counts for the most here.`,
+      }. For many people a falling trend tracks with pain more than a steady low, so it counts for the most here.`,
     )
   } else if (today.steepestRate != null && today.steepestRate > 0.5) {
     reasons.push('Pressure is holding or rising through the day, which tends to bring relief.')
